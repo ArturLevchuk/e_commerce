@@ -56,7 +56,8 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
   @override
   Widget build(BuildContext context) {
     final allProducts = context.read<ProductsBloc>().state.items;
-    final productsListBySearch = productsBySearch(allProducts, textEditingController.text, sortFilter);
+    final productsListBySearch =
+        productsBySearch(allProducts, textEditingController.text, sortFilter);
     return Scaffold(
       appBar: newAppBar(),
       body: Column(
@@ -103,7 +104,6 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
                               });
                               break;
                           }
-
                         },
                       );
                     }
@@ -133,9 +133,7 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
           Expanded(
             child: ProductsGrid(
               products: filterColors.isNotEmpty
-                  ? filteredProducts(
-                      productsListBySearch,
-                      filterColors)
+                  ? filteredProducts(productsListBySearch, filterColors)
                   : productsListBySearch,
             ),
           ),
@@ -183,5 +181,3 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
     );
   }
 }
-
-

@@ -42,6 +42,5 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
         isFavorite: products[index].isFavorite, id: event.id);
     products[index] = products[index].copyWithNewFav(finalBool);
     emit(state.copyWith(items: products, error: null));
-    
   }
 }

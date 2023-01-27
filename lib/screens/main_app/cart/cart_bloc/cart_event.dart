@@ -9,7 +9,7 @@ abstract class CartEvent extends Equatable {
 
 class RequestCart extends CartEvent {}
 
-class AddToCart extends CartEvent{
+class AddToCart extends CartEvent {
   final String productId;
   final int numOfItem;
   final Color color;
@@ -21,11 +21,9 @@ class AddToCart extends CartEvent{
   });
 }
 
-class RemoveFromCart extends CartEvent{
+class RemoveFromCart extends CartEvent {
   final int index;
   const RemoveFromCart({required this.index});
 }
 
-class ClearCart extends CartEvent{
-  
-}
+class ClearCart extends CartEvent {}

@@ -35,12 +35,11 @@ class ProductsState {
     return items.firstWhere((element) => element.id == id);
   }
 
-    bool favById(String id) {
+  bool favById(String id) {
     return items.firstWhere((element) => element.id == id).isFavorite;
   }
 
   double getPriceOfItem(String id) {
     return items.firstWhere((element) => element.id == id).price;
   }
-  
 }

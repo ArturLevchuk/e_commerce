@@ -1,4 +1,3 @@
-
 part of '../cart_screen.dart';
 
 class CheckOutCard extends StatelessWidget {

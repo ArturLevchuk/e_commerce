@@ -126,5 +126,4 @@ class CartRepository {
       rethrow;
     }
   }
-
 }

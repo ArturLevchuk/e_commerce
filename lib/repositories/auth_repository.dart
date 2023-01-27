@@ -43,11 +43,11 @@ class AuthRepositiry {
       if (remember) {
         SharedPreferences.getInstance().then((prefs) {
           final userData = json.encode({
-          'token': _token,
-          'userId': _userId,
-          'expiryDate': _expiryDate!.toIso8601String(),
-        });
-        prefs.setString('userData', userData);
+            'token': _token,
+            'userId': _userId,
+            'expiryDate': _expiryDate!.toIso8601String(),
+          });
+          prefs.setString('userData', userData);
         });
       }
     } catch (err) {

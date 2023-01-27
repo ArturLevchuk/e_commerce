@@ -14,7 +14,7 @@ class OtpScreen extends StatelessWidget {
       appBar: newAppBar(),
       body: SingleChildScrollView(
         child: Container(
-          width: double.infinity, 
+          width: double.infinity,
           padding:
               EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(20)),
           child: Column(children: [

@@ -112,7 +112,8 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
                       if (errors.isEmpty) {
                         _formKey.currentState?.save();
                         try {
-                          await RepositoryProvider.of<AuthRepositiry>(context, listen: false)
+                          await RepositoryProvider.of<AuthRepositiry>(context,
+                                  listen: false)
                               .signup({
                             'email': widget.args['email'] as String,
                             'password': widget.args['password'] as String,
@@ -126,7 +127,8 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
                           ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text(err.toString())));
                         } finally {
-                          if (RepositoryProvider.of<AuthRepositiry>(context, listen: false)
+                          if (RepositoryProvider.of<AuthRepositiry>(context,
+                                  listen: false)
                               .isAuth) {
                             setState(() {
                               isLoading = false;
