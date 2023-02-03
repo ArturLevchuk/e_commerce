@@ -107,7 +107,7 @@ class _HomeScreenState extends State<HomeScreen>
             if (!_offsetAnimation.isCompleted)
               SlideTransition(
                 position: _offsetAnimation,
-                child: const LoadingHomeScreenSplash(),
+                child: const LoadingHomeScreenSplash()
               ),
           ],
         );
@@ -115,3 +115,4 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 }
+
