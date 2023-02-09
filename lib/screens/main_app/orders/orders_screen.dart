@@ -1,3 +1,4 @@
+import 'package:e_commerce/constants.dart';
 import 'package:e_commerce/screens/main_app/orders/orders_bloc/orders_bloc.dart';
 import 'package:e_commerce/size_config.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +24,12 @@ class _OrdersScreenState extends State<OrdersScreen> {
     super.didChangeDependencies();
   }
 
+  Future<void> _refresh() async {
+    final bloc = context.read<OrdersBloc>().stream.first;
+    context.read<OrdersBloc>().add(RequestOrders());
+    await bloc;
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<OrdersBloc, OrdersState>(
@@ -46,42 +53,57 @@ class _OrdersScreenState extends State<OrdersScreen> {
                   }),
               titleSpacing: 0,
             ),
-            body: ordersProvItems.isEmpty
-                ? Center(
-                    child: Column(mainAxisSize: MainAxisSize.min, children: [
-                      Text(
-                        "Looks like no orders yet",
-                        style: Theme.of(context).textTheme.headline5,
-                      ),
-                      SizedBox(
-                        width: SizeConfig.screenWidth * .8,
-                        child: AspectRatio(
-                          aspectRatio: 1,
-                          child: Image.asset("assets/images/orders list.jpg"),
+            body: RefreshIndicator(
+              color: kPrimaryColor,
+              displacement: 80,
+              onRefresh: _refresh,
+              child: ordersProvItems.isEmpty
+                  ? CustomScrollView(
+                      slivers: [
+                        SliverFillRemaining(
+                          child: Center(
+                            child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    "Looks like no orders yet",
+                                    style:
+                                        Theme.of(context).textTheme.headline5,
+                                  ),
+                                  SizedBox(
+                                    width: SizeConfig.screenWidth * .8,
+                                    child: AspectRatio(
+                                      aspectRatio: 1,
+                                      child: Image.asset(
+                                          "assets/images/orders list.jpg"),
+                                    ),
+                                  ),
+                                ]),
+                          ),
                         ),
-                      ),
-                    ]),
-                  )
-                : ListView.builder(
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: getProportionateScreenWidth(20),
-                        ),
-                        child: Column(
-                          children: [
-                            OrderItemCard(
-                              orderItem: ordersProvItems[index],
-                            ),
-                            if (index == ordersProvItems.length - 1)
-                              SizedBox(
-                                height: getProportionateScreenWidth(20),
+                      ],
+                    )
+                  : ListView.builder(
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: getProportionateScreenWidth(20),
+                          ),
+                          child: Column(
+                            children: [
+                              OrderItemCard(
+                                orderItem: ordersProvItems[index],
                               ),
-                          ],
-                        ),
-                      );
-                    },
-                    itemCount: ordersProvItems.length),
+                              if (index == ordersProvItems.length - 1)
+                                SizedBox(
+                                  height: getProportionateScreenWidth(20),
+                                ),
+                            ],
+                          ),
+                        );
+                      },
+                      itemCount: ordersProvItems.length),
+            ),
           );
         } else {
           return const LoadingScreen();
