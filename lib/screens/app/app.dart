@@ -1,3 +1,4 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:e_commerce/repositories/cart_repository.dart';
 import 'package:e_commerce/repositories/orders_repository.dart';
 import 'package:e_commerce/screens/loading_screen.dart';
@@ -10,12 +11,15 @@ import '../../repositories/auth_repository.dart';
 import '../../repositories/products_repository.dart';
 import '../../routs.dart';
 import '../../theme.dart';
+import '../../utils/notification_controller.dart';
 import '../main_app/home/products_bloc/products_bloc.dart';
 import '../splash_screen.dart';
 import 'auth_bloc/auth_bloc.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
+
+  static final navigatorKey = GlobalKey<NavigatorState>();
 
   Widget homeScreen(AuthState state) {
     if (state is Unauthenticated) {
@@ -28,6 +32,13 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AwesomeNotifications().setListeners(
+      onActionReceivedMethod: NotificationController.onActionReceivedMethod,
+      onNotificationCreatedMethod:
+          NotificationController.onNotificationCreatedMethod,
+      onNotificationDisplayedMethod:
+          NotificationController.onNotificationDisplayedMethod,
+    );
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider(
@@ -75,6 +86,7 @@ class App extends StatelessWidget {
               title: 'Flutter E-commerce',
               debugShowCheckedModeBanner: false,
               theme: theme(),
+              navigatorKey: navigatorKey,
               home: homeScreen(state),
               routes: routes,
             );

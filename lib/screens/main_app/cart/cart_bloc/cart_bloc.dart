@@ -1,6 +1,8 @@
 import 'dart:ui';
 import 'package:bloc/bloc.dart';
+import 'package:e_commerce/constants.dart';
 import 'package:e_commerce/repositories/cart_repository.dart';
+import 'package:e_commerce/utils/notifications.dart';
 import 'package:equatable/equatable.dart';
 import '../../../../repositories/models/cart_item.dart';
 
@@ -43,6 +45,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
         color: event.color,
         items: state.items,
       );
+      await createCartNotification(state.items.length);
       emit(state.copyWith(items: newItems));
     } catch (err) {
       rethrow;
@@ -58,6 +61,8 @@ class CartBloc extends Bloc<CartEvent, CartState> {
         index: event.index,
         items: state.items,
       );
+      await cancelNotificationsByChannelKey(cartNotificationKey);
+      await createCartNotification(newItems.length);
       emit(state.copyWith(items: newItems));
     } catch (err) {
       rethrow;

@@ -52,3 +52,5 @@ OutlineInputBorder outlineInputBorder() {
     borderSide: const BorderSide(color: kTextColor),
   );
 }
+
+const cartNotificationKey = "cart_notifications";
