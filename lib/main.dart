@@ -2,7 +2,6 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:e_commerce/utils/custom_blocobserver.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'constants.dart';
-import 'utils/notification_controller.dart';
 import 'package:flutter/material.dart';
 import 'screens/app/app.dart';
 

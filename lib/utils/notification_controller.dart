@@ -49,11 +49,7 @@ class NotificationController {
       ReceivedAction receivedAction) async {
     AwesomeNotifications().cancelNotificationsByChannelKey(cartNotificationKey);
     if (receivedAction.channelKey == cartNotificationKey) {
-      App.navigatorKey.currentState?.pushNamedAndRemoveUntil(
-          CartScreen.routeName,
-          (route) =>
-              (route.settings.name != CartScreen.routeName) || route.isFirst,
-          arguments: receivedAction);
+      App.navigatorKey.currentState?.pushReplacementNamed(CartScreen.routeName);
     }
   }
 }
