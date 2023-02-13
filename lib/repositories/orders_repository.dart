@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:ui';
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
+
 import '../utils/HttpException.dart';
 import 'models/cart_item.dart';
 import 'models/order_item.dart';
@@ -18,9 +19,9 @@ class OrdersRepository {
     try {
       final url = Uri.parse(
           'https://e-commerce-26828-default-rtdb.firebaseio.com/orders/$userId.json?auth=$authToken');
-      final response = await http.get(url);
+      final response = await Dio().getUri(url);
       final List<OrderItem> loadedOrders = [];
-      final extractedData = json.decode(response.body) as Map<String, dynamic>?;
+      final extractedData = response.data as Map<String, dynamic>?;
       if (extractedData == null) {
         return [];
       }
@@ -41,7 +42,7 @@ class OrdersRepository {
       });
       return loadedOrders;
     } catch (err) {
-      throw HttpException(err.toString());
+      throw HttpException((err as DioError).error.toString());
     }
   }
 
@@ -55,8 +56,8 @@ class OrdersRepository {
     try {
       final url = Uri.parse(
           'https://e-commerce-26828-default-rtdb.firebaseio.com/orders/$userId.json?auth=$authToken');
-      final response = await http.post(url,
-          body: json.encode({
+      await Dio().postUri(url,
+          data: json.encode({
             "totalPrice": totalPrice,
             "arrivePlace": arrivePlace,
             "payment": payment,
@@ -69,11 +70,8 @@ class OrdersRepository {
                 .toList(),
             "dateTime": timeCode.toIso8601String(),
           }));
-      if (response.statusCode >= 400) {
-        throw HttpException("${response.statusCode}");
-      }
     } catch (err) {
-      rethrow;
+      throw HttpException((err as DioError).error.toString());
     }
   }
 
@@ -82,16 +80,11 @@ class OrdersRepository {
     try {
       final url = Uri.parse(
           'https://e-commerce-26828-default-rtdb.firebaseio.com/orders/$userId/$orderId.json?auth=$authToken');
-      final response = await http.delete(url);
-      if (response.statusCode >= 400) {
-        throw HttpException("${response.statusCode}");
-      }
-    } catch (err) {
-      rethrow;
-    } finally {
+      await Dio().deleteUri(url);
       orders.removeWhere((orderItem) => orderItem.id == orderId);
-      // ignore: control_flow_in_finally
       return orders;
+    } catch (err) {
+      throw HttpException((err as DioError).error.toString());
     }
   }
 }

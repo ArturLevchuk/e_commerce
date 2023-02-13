@@ -47,11 +47,17 @@ class ProductCard extends StatelessWidget {
                     color: kSecondaryColor.withOpacity(.1),
                     borderRadius: BorderRadius.circular(15),
                   ),
-                  // child: Image.network(product.images[0]),
+                  // child: Image.network(
+                  //   product.images[0],
+                  // ),
+
                   child: FadeInImage.assetNetwork(
                     alignment: Alignment.center,
                     placeholder: "assets/images/box.png",
                     image: product.images[0],
+                    imageErrorBuilder: (context, error, stackTrace) {
+                      return const Icon(Icons.error);
+                    },
                   ),
                 ),
               ),

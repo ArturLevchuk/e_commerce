@@ -46,29 +46,31 @@ class _ChooseAndAddToCartState extends State<ChooseAndAddToCart> {
                     ? "Add to cart"
                     : "Out of Stock",
                 press: () async {
-                  try {
-                    context.read<CartBloc>().add(AddToCart(
-                          productId: widget.product.id,
-                          numOfItem: numOfItem,
-                          color: widget.product.colors.elementAt(selectedColor),
-                        ));
-                  } catch (err) {
-                    showDialog(
-                      context: context,
-                      builder: (_) => const AlertDialogTextWithPic(
-                        text: "Something went wrong!",
-                        svgSrc: "assets/icons/Close.svg",
-                      ),
-                    );
-                  } finally {
-                    showDialog(
-                      context: context,
-                      builder: (_) => const AlertDialogTextWithPic(
-                        text: "Product added to cart!",
-                        svgSrc: "assets/icons/Check mark rounde.svg",
-                      ),
-                    );
-                  }
+                  final bloc = context.read<CartBloc>().stream.first;
+                  context.read<CartBloc>().add(AddToCart(
+                        productId: widget.product.id,
+                        numOfItem: numOfItem,
+                        color: widget.product.colors.elementAt(selectedColor),
+                      ));
+                  await bloc.then((state) {
+                    if (state.error != null) {
+                      showDialog(
+                        context: context,
+                        builder: (_) => const AlertDialogTextWithPic(
+                          text: "Something went wrong!",
+                          svgSrc: "assets/icons/Close.svg",
+                        ),
+                      );
+                    } else {
+                      showDialog(
+                        context: context,
+                        builder: (_) => const AlertDialogTextWithPic(
+                          text: "Product added to cart!",
+                          svgSrc: "assets/icons/Check mark rounde.svg",
+                        ),
+                      );
+                    }
+                  });
                 },
               ),
             ),

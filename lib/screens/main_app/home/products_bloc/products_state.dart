@@ -18,7 +18,7 @@ class ProductsState {
     return ProductsState(
       items: items ?? this.items,
       productsLoadStatus: productsLoadStatus ?? this.productsLoadStatus,
-      error: error ?? this.error,
+      error: error,
     );
   }
 

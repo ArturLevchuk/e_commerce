@@ -33,7 +33,7 @@ class _UserInformationEditScreenState extends State<UserInformationEditScreen> {
         userInformation =
             await context.read<AuthRepositiry>().getUserInformation();
       } on HttpException catch (err) {
-        showErrorDialog(context, err).then((_) {
+        showErrorDialog(context, err.toString()).then((_) {
           Navigator.of(context).pop();
         });
       } catch (err) {
@@ -100,7 +100,7 @@ class _UserInformationEditScreenState extends State<UserInformationEditScreen> {
                                           phoneNumber: phoneNumber,
                                         ));
                                   } on HttpException catch (err) {
-                                    showErrorDialog(context, err);
+                                    showErrorDialog(context, err.toString());
                                   } catch (err) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                         SnackBar(

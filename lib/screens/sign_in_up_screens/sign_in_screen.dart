@@ -159,7 +159,7 @@ class _SignFormState extends State<SignForm> {
                         }
                       }
                     } on HttpException catch (err) {
-                      showErrorDialog(context, err);
+                      showErrorDialog(context, err.toString());
                     } catch (err) {
                       ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text(err.toString())));

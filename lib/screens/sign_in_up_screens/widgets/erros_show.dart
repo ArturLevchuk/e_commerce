@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../utils/HttpException.dart';
 
-Future<dynamic> showErrorDialog(BuildContext context, HttpException err) {
+Future<dynamic> showErrorDialog(BuildContext context, String err) {
   return showDialog(
     context: context,
     builder: (context) => AlertDialog(
@@ -12,7 +12,7 @@ Future<dynamic> showErrorDialog(BuildContext context, HttpException err) {
           const EdgeInsets.only(left: 24, right: 24, top: 6, bottom: 0),
       title: const Text('Error occured!'),
       content: Text(
-        err.toString(),
+        err,
         maxLines: 6,
         overflow: TextOverflow.ellipsis,
       ),

@@ -43,17 +43,16 @@ class _OrdersConfirmScreenState extends State<OrdersConfirmScreen> {
       try {
         userInformation =
             await context.read<AuthRepositiry>().getUserInformation();
+        setState(() {
+          isLoading = false;
+        });
       } on HttpException catch (err) {
-        showErrorDialog(context, err).then((_) {
+        showErrorDialog(context, err.toString()).then((_) {
           Navigator.of(context).pop();
         });
       } catch (err) {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text(err.toString())));
-      } finally {
-        setState(() {
-          isLoading = false;
-        });
       }
     }
     super.didChangeDependencies();
@@ -232,6 +231,7 @@ class _OrdersConfirmScreenState extends State<OrdersConfirmScreen> {
                                         "Card: $cardNum Cvv: $cvv ExpDate: $expdate CardNameHolder: $cardNameHolder";
                                   }
                                 }
+
                                 try {
                                   context.read<OrdersBloc>().add(AddOrder(
                                         cartProducts: cartItemInf["cartItems"],
@@ -239,8 +239,27 @@ class _OrdersConfirmScreenState extends State<OrdersConfirmScreen> {
                                         arrivePlace: deliveryArrivePlace,
                                         payment: paymentInf,
                                       ));
+                                  final bloc =
+                                      context.read<OrdersBloc>().stream.first;
                                   context.read<CartBloc>().add(ClearCart());
-                                } on HttpException catch (err) {
+                                  await bloc.then((state) {
+                                    if (state.error != null) {
+                                      throw state.error!;
+                                    } else {
+                                      showDialog(
+                                        context: context,
+                                        builder: (_) =>
+                                            const AlertDialogTextWithPic(
+                                          text: "Order is processed!",
+                                          svgSrc:
+                                              "assets/icons/Check mark rounde.svg",
+                                        ),
+                                      ).then((_) {
+                                        Navigator.of(context).pop();
+                                      });
+                                    }
+                                  });
+                                } catch (err) {
                                   showDialog(
                                     context: context,
                                     builder: (_) =>
@@ -249,22 +268,6 @@ class _OrdersConfirmScreenState extends State<OrdersConfirmScreen> {
                                       svgSrc: "assets/icons/Close.svg",
                                     ),
                                   );
-                                  // showErrorDialog(context, err);
-                                } catch (err) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text(err.toString())));
-                                } finally {
-                                  showDialog(
-                                    context: context,
-                                    builder: (_) =>
-                                        const AlertDialogTextWithPic(
-                                      text: "Order is processed!",
-                                      svgSrc:
-                                          "assets/icons/Check mark rounde.svg",
-                                    ),
-                                  ).then((_) {
-                                    Navigator.of(context).pop();
-                                  });
                                 }
                                 setState(() {
                                   orderingProcess = false;

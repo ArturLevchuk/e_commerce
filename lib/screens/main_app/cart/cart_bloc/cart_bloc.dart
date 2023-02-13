@@ -30,7 +30,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
         state.copyWith(items: items, cartLoadStatus: CartLoadStatus.loaded),
       );
     } catch (err) {
-      rethrow;
+      emit(state.copyWith(error: err.toString()));
     }
   }
 
@@ -45,10 +45,10 @@ class CartBloc extends Bloc<CartEvent, CartState> {
         color: event.color,
         items: state.items,
       );
-      await createCartNotification(state.items.length);
+      // await createCartNotification(state.items.length);
       emit(state.copyWith(items: newItems));
     } catch (err) {
-      rethrow;
+      emit(state.copyWith(error: err.toString()));
     }
   }
 
@@ -61,11 +61,11 @@ class CartBloc extends Bloc<CartEvent, CartState> {
         index: event.index,
         items: state.items,
       );
-      await cancelNotificationsByChannelKey(cartNotificationKey);
-      await createCartNotification(newItems.length);
       emit(state.copyWith(items: newItems));
+      //   // await cancelNotificationsByChannelKey(cartNotificationKey);
+      //   // await createCartNotification(newItems.length);
     } catch (err) {
-      rethrow;
+      emit(state.copyWith(error: err.toString()));
     }
   }
 
@@ -77,7 +77,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       await cartRepository.clearCart();
       emit(state.copyWith(items: {}));
     } catch (err) {
-      rethrow;
+      emit(state.copyWith(error: err.toString()));
     }
   }
 }

@@ -24,11 +24,16 @@ class CartScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final productListProv = context.read<ProductsBloc>();
-    return BlocBuilder<CartBloc, CartState>(
+    return BlocConsumer<CartBloc, CartState>(
+      listener: (context, state) {
+        if (state.error != null) {
+          showErrorDialog(context, state.error.toString());
+        }
+      },
       builder: (context, state) {
         final cartList = state.items;
         return Scaffold(
-          appBar: newAppBar(context, cartList.length),
+          appBar: newAppBar(context),
           body: Padding(
             padding: EdgeInsets.symmetric(
                 horizontal: getProportionateScreenWidth(20)),
@@ -53,7 +58,8 @@ class CartScreen extends StatelessWidget {
                     itemBuilder: (context, index) => Padding(
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       child: Dismissible(
-                        key: Key(cartList.keys.elementAt(index)),
+                        // key: Key(cartList.keys.elementAt(index)),
+                        key: UniqueKey(),
                         direction: DismissDirection.endToStart,
                         background: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -74,21 +80,9 @@ class CartScreen extends StatelessWidget {
                           numOfItem: cartList.values.elementAt(index).numOfItem,
                         ),
                         onDismissed: (direction) async {
-                          try {
-                            context
-                                .read<CartBloc>()
-                                .add((RemoveFromCart(index: index)));
-                          } on HttpException catch (err) {
-                            showErrorDialog(context, err);
-                          } catch (err) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  err.toString(),
-                                ),
-                              ),
-                            );
-                          }
+                          context
+                              .read<CartBloc>()
+                              .add((RemoveFromCart(index: index)));
                         },
                         confirmDismiss: (dir) {
                           return showDialog(
@@ -124,25 +118,29 @@ class CartScreen extends StatelessWidget {
     );
   }
 
-  AppBar newAppBar(BuildContext context, int numOfItems) {
+  AppBar newAppBar(BuildContext context) {
     return AppBar(
       centerTitle: true,
-      title: RichText(
-        textAlign: TextAlign.center,
-        text: TextSpan(
-          style: Theme.of(context).textTheme.bodyText1,
-          children: [
-            TextSpan(
-                text: "Your Cart\n",
-                style: TextStyle(
-                    color: Colors.black,
-                    fontSize: getProportionateScreenWidth(18))),
-            TextSpan(
-              text: "$numOfItems items",
-              style: const TextStyle(height: 1),
+      title: BlocBuilder<CartBloc, CartState>(
+        builder: (context, state) {
+          return RichText(
+            textAlign: TextAlign.center,
+            text: TextSpan(
+              style: Theme.of(context).textTheme.bodyText1,
+              children: [
+                TextSpan(
+                    text: "Your Cart\n",
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontSize: getProportionateScreenWidth(18))),
+                TextSpan(
+                  text: "${state.items.length} items",
+                  style: const TextStyle(height: 1),
+                ),
+              ],
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }

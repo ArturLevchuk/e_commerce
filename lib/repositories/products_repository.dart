@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:ui';
+import 'package:dio/dio.dart';
 import 'package:e_commerce/utils/HttpException.dart';
-import 'package:http/http.dart' as http;
 import 'models/product.dart';
 
 class ProductsRepository {
@@ -14,16 +14,16 @@ class ProductsRepository {
     try {
       final url = Uri.parse(
           'https://e-commerce-26828-default-rtdb.firebaseio.com/products.json?auth=$authToken');
-      final response = await http.get(url);
-      final extractedData = json.decode(response.body) as Map<String, dynamic>?;
+      final response = await Dio().getUri(url);
+      final extractedData = response.data as Map<String, dynamic>?;
       if (extractedData == null) {
         throw HttpException(
             "Looks like something happend on server. Please try later.");
       }
       final favUrl = Uri.parse(
           'https://e-commerce-26828-default-rtdb.firebaseio.com/userFavorites/$userId.json?auth=$authToken');
-      final favResponse = await http.get(favUrl);
-      final favData = json.decode(favResponse.body);
+      final favResponse = await Dio().getUri(favUrl);
+      final favData = favResponse.data;
 
       final List<Product> loadedProducts = [];
       extractedData.forEach((prodId, prodData) {
@@ -45,10 +45,8 @@ class ProductsRepository {
         ));
       });
       return loadedProducts;
-    } on HttpException {
-      rethrow;
     } catch (err) {
-      throw HttpException(err.toString());
+      throw HttpException((err as DioError).error.toString());
     }
   }
 
@@ -60,18 +58,13 @@ class ProductsRepository {
         'https://e-commerce-26828-default-rtdb.firebaseio.com/userFavorites/$userId/$id.json?auth=$authToken');
 
     try {
-      late http.Response response;
       if (!oldStatus) {
-        response = await http.put(url,
-            body: json.encode(
+        await Dio().putUri(url,
+            data: json.encode(
               isFavorite,
             ));
       } else {
-        response = await http.delete(url);
-      }
-      if (response.statusCode >= 400) {
-        isFavorite = oldStatus;
-        return isFavorite;
+        await Dio().deleteUri(url);
       }
     } catch (err) {
       isFavorite = oldStatus;

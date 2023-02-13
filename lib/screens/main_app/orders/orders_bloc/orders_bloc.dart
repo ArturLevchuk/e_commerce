@@ -27,7 +27,7 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
       emit(state.copyWith(
           orders: orderItems, ordersLoadStatus: OrdersLoadStatus.loaded));
     } catch (err) {
-      rethrow;
+      emit(state.copyWith(error: err.toString()));
     }
   }
 
@@ -44,7 +44,7 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
       );
       emit(state.copyWith(ordersLoadStatus: OrdersLoadStatus.initial));
     } catch (err) {
-      rethrow;
+      emit(state.copyWith(error: err.toString()));
     }
   }
 
@@ -59,7 +59,7 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
       );
       emit(state.copyWith(orders: newOrdersList));
     } catch (err) {
-      rethrow;
+      emit(state.copyWith(error: err.toString()));
     }
   }
 }

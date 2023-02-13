@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:dio/dio.dart';
 import 'package:e_commerce/utils/HttpException.dart';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'models/user_information.dart';
 
@@ -20,17 +20,15 @@ class AuthRepositiry {
       [bool remember = true]) async {
     final url = Uri.parse(
         'https://identitytoolkit.googleapis.com/v1/accounts:$urlSegment?key=$webKey');
+
     try {
-      final response = await http.post(url,
-          body: json.encode({
+      final response = await Dio().postUri(url,
+          data: json.encode({
             'email': email,
             'password': password,
             'returnSecureToken': true,
           }));
-      final responseData = json.decode(response.body);
-      if (responseData['error'] != null) {
-        throw HttpException(responseData['error']['message']);
-      }
+      final responseData = response.data;
       _token = responseData['idToken'];
       _userId = responseData['localId'];
       _expiryDate = DateTime.now().add(Duration(
@@ -51,7 +49,7 @@ class AuthRepositiry {
         });
       }
     } catch (err) {
-      rethrow;
+      throw HttpException((err as DioError).response?.data['error']['message']);
     }
   }
 
@@ -60,9 +58,9 @@ class AuthRepositiry {
       await _authenticate(args['email']!, args['password']!, 'signUp');
       final url = Uri.parse(
           'https://e-commerce-26828-default-rtdb.firebaseio.com/users/$_userId.json?auth=$_token');
-      final response = await http.put(
+      final response = await Dio().putUri(
         url,
-        body: json.encode({
+        data: json.encode({
           'email': args['email'],
           'password': args['password'],
           'name': args['name'],
@@ -70,23 +68,16 @@ class AuthRepositiry {
           'adress': args['adress'],
         }),
       );
-      if (response.statusCode >= 400) {
-        throw HttpException('${response.statusCode}');
-      }
-    } on HttpException catch (_) {
-      rethrow;
     } catch (err) {
-      throw HttpException(err.toString());
+      throw HttpException((err as DioError).response?.data['error']['message']);
     }
   }
 
   Future<void> login(String email, String password, bool remember) async {
     try {
       await _authenticate(email, password, 'signInWithPassword', remember);
-    } on HttpException catch (_) {
-      rethrow;
     } catch (err) {
-      throw HttpException(err.toString());
+      throw HttpException((err as DioError).response?.data['error']['message']);
     }
   }
 
@@ -156,20 +147,15 @@ class AuthRepositiry {
     try {
       final url = Uri.parse(
           'https://e-commerce-26828-default-rtdb.firebaseio.com/users/$_userId.json?auth=$_token');
-      final response = await http.get(url);
-      if (response.statusCode >= 400) {
-        throw HttpException('${response.statusCode}');
-      }
-      final extractedData = json.decode(response.body) as Map<String, dynamic>;
+      final response = await Dio().getUri(url);
+      final extractedData = response.data as Map<String, dynamic>;
       return UserInformation(
         adress: extractedData['adress'],
         name: extractedData['name'],
         phoneNumber: extractedData['phoneNumber'],
       );
-    } on HttpException {
-      rethrow;
     } catch (err) {
-      throw HttpException(err.toString());
+      throw HttpException((err as DioError).error.toString());
     }
   }
 
@@ -177,17 +163,14 @@ class AuthRepositiry {
     try {
       final url = Uri.parse(
           'https://e-commerce-26828-default-rtdb.firebaseio.com/users/$_userId.json?auth=$_token');
-      final response = await http.patch(url,
-          body: json.encode({
+      await Dio().patchUri(url,
+          data: json.encode({
             "adress": userInformation.adress,
             "name": userInformation.name,
             "phoneNumber": userInformation.phoneNumber,
           }));
-      if (response.statusCode >= 400) {
-        throw HttpException('${response.statusCode}');
-      }
     } catch (err) {
-      throw HttpException(err.toString());
+      throw HttpException((err as DioError).response?.data['error']['message']);
     }
   }
 }

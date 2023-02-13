@@ -41,6 +41,6 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
     final finalBool = await _productsRepository.toggleFavoriteStatus(
         isFavorite: products[index].isFavorite, id: event.id);
     products[index] = products[index].copyWithNewFav(finalBool);
-    emit(state.copyWith(items: products, error: null));
+    emit(state.copyWith(items: products));
   }
 }

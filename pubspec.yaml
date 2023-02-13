@@ -31,12 +31,12 @@ environment:
 dependencies:
   awesome_notifications: ^0.7.4+1
   cupertino_icons: ^1.0.2
+  dio: ^4.0.6
   equatable: ^2.0.5
   flutter:
     sdk: flutter
   flutter_bloc: ^8.1.1
   flutter_svg: ^0.22.0
-  http: ^0.13.5
   intl: ^0.17.0
   shared_preferences: ^2.0.15
 

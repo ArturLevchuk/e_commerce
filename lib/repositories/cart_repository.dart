@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'dart:ui';
+import 'package:dio/dio.dart';
 import 'package:e_commerce/utils/HttpException.dart';
-import 'package:http/http.dart' as http;
+// import 'package:http/http.dart' as http;
 
 import 'models/cart_item.dart';
 
@@ -14,8 +15,8 @@ class CartRepository {
     try {
       final url = Uri.parse(
           'https://e-commerce-26828-default-rtdb.firebaseio.com/cart/$userId.json?auth=$authToken');
-      final http.Response response = await http.get(url);
-      final extractedData = json.decode(response.body) as Map<String, dynamic>?;
+      final response = await Dio().getUri(url);
+      final extractedData = response.data as Map<String, dynamic>?;
       if (extractedData == null) {
         return {};
       }
@@ -34,7 +35,7 @@ class CartRepository {
       });
       return loadedProducts;
     } catch (err) {
-      throw HttpException(err.toString());
+      throw HttpException((err as DioError).error.toString());
     }
   }
 
@@ -51,13 +52,10 @@ class CartRepository {
           final key = items.keys.elementAt(i);
           final url = Uri.parse(
               'https://e-commerce-26828-default-rtdb.firebaseio.com/cart/$userId/$key.json?auth=$authToken');
-          final response = await http.patch(url,
-              body: json.encode({
+          await Dio().patchUri(url,
+              data: json.encode({
                 "numOfItem": items.values.elementAt(i).numOfItem + numOfItem,
               }));
-          if (response.statusCode >= 400) {
-            throw HttpException("${response.statusCode}");
-          }
           items.update(
             key,
             (oldCartItem) => CartItem(
@@ -70,17 +68,14 @@ class CartRepository {
       }
       final url = Uri.parse(
           'https://e-commerce-26828-default-rtdb.firebaseio.com/cart/$userId.json?auth=$authToken');
-      final response = await http.post(url,
-          body: json.encode({
+      final response = await Dio().postUri(url,
+          data: json.encode({
             "productId": productId,
             "numOfItem": numOfItem,
             "color": color.value,
           }));
-      if (response.statusCode >= 400) {
-        throw "${response.statusCode}";
-      }
       items.putIfAbsent(
-        json.decode(response.body)['name'],
+        response.data['name'],
         () => CartItem(
           productId: productId,
           numOfItem: numOfItem,
@@ -89,7 +84,7 @@ class CartRepository {
       );
       return items;
     } catch (err) {
-      rethrow;
+      throw HttpException((err as DioError).error.toString());
     }
   }
 
@@ -101,16 +96,11 @@ class CartRepository {
     try {
       final url = Uri.parse(
           'https://e-commerce-26828-default-rtdb.firebaseio.com/cart/$userId/$key.json?auth=$authToken');
-      final response = await http.delete(url);
-      if (response.statusCode >= 400) {
-        throw HttpException("${response.statusCode}");
-      }
-    } catch (err) {
-      rethrow;
-    } finally {
+      final response = await Dio().deleteUri(url);
       items.remove(key);
-      // ignore: control_flow_in_finally
       return items;
+    } catch (err) {
+      throw HttpException((err as DioError).error.toString());
     }
   }
 
@@ -118,12 +108,9 @@ class CartRepository {
     try {
       final url = Uri.parse(
           'https://e-commerce-26828-default-rtdb.firebaseio.com/cart/$userId.json?auth=$authToken');
-      final response = await http.delete(url);
-      if (response.statusCode >= 400) {
-        throw HttpException("${response.statusCode}");
-      }
+      await Dio().deleteUri(url);
     } catch (err) {
-      rethrow;
+      throw HttpException((err as DioError).error.toString());
     }
   }
 }
