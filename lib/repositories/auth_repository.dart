@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:dio/dio.dart';
+import 'package:e_commerce/screens/app/app.dart';
 import 'package:e_commerce/utils/HttpException.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'models/user_information.dart';
@@ -130,6 +131,7 @@ class AuthRepositiry {
       _authTimer = null;
     }
     _authStreamController.add(false);
+    App.navigatorKey.currentState?.pushReplacementNamed('/');
     final prefs = await SharedPreferences.getInstance();
     // prefs.remove('userData');
     prefs.clear();
