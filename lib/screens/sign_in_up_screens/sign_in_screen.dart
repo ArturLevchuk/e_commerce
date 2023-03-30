@@ -13,61 +13,96 @@ import 'widgets/FormError.dart';
 import 'widgets/NoAccountText.dart';
 import 'widgets/SocialCard.dart';
 
-class SignInScreen extends StatelessWidget {
+class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
   static const routeName = "/SignInScreen";
 
   @override
+  State<SignInScreen> createState() => _SignInScreenState();
+}
+
+class _SignInScreenState extends State<SignInScreen> {
+  bool _hasFocus = false;
+  List<FocusNode> _focusNodes = [];
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _getFocusNodes();
+    });
+  }
+
+  void _getFocusNodes() {
+    final focusScope = FocusScope.of(context);
+    _focusNodes = focusScope.descendants.whereType<FocusNode>().toList();
+    for (var focusNode in _focusNodes) {
+      focusNode.addListener(() {
+        setState(() {
+          _hasFocus = focusNode.hasFocus;
+        });
+      });
+    }
+  }
+  
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: newAppBar(),
-      body: SingleChildScrollView(
-        child: SafeArea(
-            child: SizedBox(
-          width: double
-              .infinity, //отримуючи всю ширину вирівнює елементи по центру?
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-                horizontal: getProportionateScreenWidth(20)),
-            child: Column(
-              children: [
-                Text(
-                  "Welcome Back",
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontSize: getProportionateScreenWidth(28),
-                      fontWeight: FontWeight.bold),
-                ),
-                const Text(
-                  "Sign in with your email and password \nor continue with social media",
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: SizeConfig.screenHeight * 0.08),
-                const SignForm(),
-                SizedBox(height: SizeConfig.screenHeight * 0.04),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SocialCard(
-                      icon: "assets/icons/facebook-2.svg",
-                      press: () {},
-                    ),
-                    SocialCard(
-                      icon: "assets/icons/google-icon.svg",
-                      press: () {},
-                    ),
-                    SocialCard(
-                      icon: "assets/icons/twitter.svg",
-                      press: () {},
-                    ),
-                  ],
-                ),
-                SizedBox(height: getProportionateScreenHeight(10)),
-                const NoAccountText(),
-              ],
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      child: Scaffold(
+        appBar: newAppBar(),
+        body: SingleChildScrollView(
+          physics: _hasFocus
+              ? const BouncingScrollPhysics()
+              : const NeverScrollableScrollPhysics(),
+          child: SafeArea(
+              child: SizedBox(
+            width: double.infinity,
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                  horizontal: getProportionateScreenWidth(20)),
+              child: Column(
+                children: [
+                  Text(
+                    "Welcome Back",
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontSize: getProportionateScreenWidth(28),
+                        fontWeight: FontWeight.bold),
+                  ),
+                  const Text(
+                    "Sign in with your email and password \nor continue with social media",
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: SizeConfig.screenHeight * 0.08),
+                  const SignForm(),
+                  SizedBox(height: SizeConfig.screenHeight * 0.02),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SocialCard(
+                        icon: "assets/icons/facebook-2.svg",
+                        press: () {},
+                      ),
+                      SocialCard(
+                        icon: "assets/icons/google-icon.svg",
+                        press: () {},
+                      ),
+                      SocialCard(
+                        icon: "assets/icons/twitter.svg",
+                        press: () {},
+                      ),
+                    ],
+                  ),
+                  const NoAccountText(),
+                ],
+              ),
             ),
-          ),
-        )),
+          )),
+        ),
       ),
     );
   }
@@ -97,102 +132,116 @@ class _SignFormState extends State<SignForm> {
   String password = "";
   bool remember = true;
   bool isLoading = false;
+  final FocusNode _emailFocusNode = FocusNode();
+  final FocusNode _passFocusNode = FocusNode();
+
+  @override
+  void dispose() {
+    _emailFocusNode.dispose();
+    _passFocusNode.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Form(
       key: _formKey,
-      child: Column(
-        children: [
-          buildEmailFormField(),
-          SizedBox(height: getProportionateScreenHeight(30)),
-          buildPasswordFormField(),
-          SizedBox(height: getProportionateScreenHeight(10)),
-          Row(
-            children: [
-              Checkbox(
-                value: remember,
-                onChanged: (value) {
-                  setState(() {
-                    remember = value!;
-                  });
-                },
-                activeColor: kPrimaryColor,
-              ),
-              const Text("Remember me"),
-              const Spacer(),
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context)
-                      .pushNamed(ForgotPasswordScreen.routeName);
-                },
-                child: const Text(
-                  "Forgot Password",
-                  style: TextStyle(
-                    decoration: TextDecoration.underline,
-                    color: kPrimaryColor,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          FormError(errors: errors),
-          SizedBox(
-              height: errors.isEmpty
-                  ? getProportionateScreenHeight(80)
-                  : getProportionateScreenWidth(10)),
-          isLoading
-              ? const CircularProgressIndicator(color: kPrimaryColor)
-              : DefaultButton(
-                  text: "Continue",
-                  press: () async {
+      child: SizedBox(
+        height: SizeConfig.screenHeight * 0.53,
+        child: Column(
+          children: [
+            buildEmailFormField(),
+            SizedBox(height: getProportionateScreenHeight(30)),
+            buildPasswordFormField(),
+            SizedBox(height: getProportionateScreenHeight(10)),
+            Row(
+              children: [
+                Checkbox(
+                  value: remember,
+                  onChanged: (value) {
                     setState(() {
-                      isLoading = true;
-                    });
-                    try {
-                      if (_formKey.currentState!.validate()) {
-                        if (errors.isEmpty) {
-                          _formKey.currentState?.save();
-                          await RepositoryProvider.of<AuthRepositiry>(context,
-                                  listen: false)
-                              .login(email, password, remember);
-                        }
-                      }
-                    } on HttpException catch (err) {
-                      showErrorDialog(context, err.toString());
-                    } catch (err) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(err.toString())));
-                    } finally {
-                      if (RepositoryProvider.of<AuthRepositiry>(context,
-                              listen: false)
-                          .isAuth) {
-                        setState(() {
-                          isLoading = false;
-                        });
-                        Navigator.of(context)
-                            .pushReplacementNamed(LoginSuccessScreen.routeName);
-                      }
-                    }
-                    setState(() {
-                      isLoading = false;
+                      remember = value!;
                     });
                   },
+                  activeColor: kPrimaryColor,
                 ),
-        ],
+                const Text("Remember me"),
+                const Spacer(),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context)
+                        .pushNamed(ForgotPasswordScreen.routeName);
+                  },
+                  child: const Text(
+                    "Forgot Password",
+                    style: TextStyle(
+                      decoration: TextDecoration.underline,
+                      color: kPrimaryColor,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            FormError(errors: errors),
+            const Spacer(),
+            isLoading
+                ? const CircularProgressIndicator(color: kPrimaryColor)
+                : DefaultButton(
+                    text: "Continue",
+                    press: () async {
+                      setState(() {
+                        isLoading = true;
+                      });
+                      try {
+                        if (_formKey.currentState!.validate()) {
+                          if (errors.isEmpty) {
+                            _formKey.currentState?.save();
+                            await RepositoryProvider.of<AuthRepositiry>(context,
+                                    listen: false)
+                                .login(email, password, remember);
+                          }
+                        }
+                      } on HttpException catch (err) {
+                        showErrorDialog(context, err.toString());
+                      } catch (err) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(err.toString())));
+                      } finally {
+                        if (RepositoryProvider.of<AuthRepositiry>(context,
+                                listen: false)
+                            .isAuth) {
+                          setState(() {
+                            isLoading = false;
+                          });
+                          Navigator.of(context).pushReplacementNamed(
+                              LoginSuccessScreen.routeName);
+                        }
+                      }
+                      setState(() {
+                        isLoading = false;
+                      });
+                    },
+                  ),
+          ],
+        ),
       ),
     );
   }
 
   TextFormField buildPasswordFormField() {
     return TextFormField(
-      decoration: const InputDecoration(
-        label: Text(
+      focusNode: _emailFocusNode,
+      decoration: InputDecoration(
+        focusedBorder: Theme.of(context)
+            .inputDecorationTheme
+            .border
+            ?.copyWith(borderSide: const BorderSide(color: kPrimaryColor)),
+        label: const Text(
           "Password",
           style: TextStyle(color: kTextColor),
         ),
         hintText: "Enter your Password",
-        suffixIcon: CustomSuffixIcon(svgIcon: "assets/icons/Lock.svg"),
+        suffixIcon: const CustomSuffixIcon(svgIcon: "assets/icons/Lock.svg"),
       ),
       obscureText: true,
       onSaved: (newValue) {
@@ -228,14 +277,19 @@ class _SignFormState extends State<SignForm> {
 
   TextFormField buildEmailFormField() {
     return TextFormField(
+      focusNode: _passFocusNode,
       keyboardType: TextInputType.emailAddress,
-      decoration: const InputDecoration(
-        label: Text(
+      decoration: InputDecoration(
+        focusedBorder: Theme.of(context)
+            .inputDecorationTheme
+            .border
+            ?.copyWith(borderSide: const BorderSide(color: kPrimaryColor)),
+        label: const Text(
           "Email",
           style: TextStyle(color: kTextColor),
         ),
         hintText: "Enter your email",
-        suffixIcon: CustomSuffixIcon(svgIcon: "assets/icons/Mail.svg"),
+        suffixIcon: const CustomSuffixIcon(svgIcon: "assets/icons/Mail.svg"),
       ),
       onSaved: (newValue) {
         email = newValue!;

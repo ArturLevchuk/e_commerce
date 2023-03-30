@@ -58,89 +58,96 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
     final allProducts = context.read<ProductsBloc>().state.items;
     final productsListBySearch =
         productsBySearch(allProducts, textEditingController.text, sortFilter);
-    return Scaffold(
-      appBar: newAppBar(),
-      body: Column(
-        children: [
-          DecoratedBox(
-            decoration: const BoxDecoration(
-              border: Border(
-                bottom: BorderSide(color: Colors.black12),
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      child: Scaffold(
+        extendBody: true,
+        appBar: newAppBar(),
+        body: Column(
+          children: [
+            DecoratedBox(
+              decoration: const BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(color: Colors.black12),
+                ),
+              ),
+              child: Row(
+                children: [
+                  SortingButton(
+                    title: "Sorting",
+                    subtitle: "by $sortFilterName",
+                    icon: const Icon(Icons.swap_vert),
+                    press: () async {
+                      final value = await Navigator.of(context).pushNamed(
+                          SortingScreen.routeName,
+                          arguments: sortFilter) as SortType?;
+                      if (value != null) {
+                        setState(
+                          () {
+                            sortFilter = value;
+                            switch (sortFilter) {
+                              case SortType.popular:
+                                setState(() {
+                                  sortFilterName = 'popular';
+                                });
+                                break;
+                              case SortType.newProduct:
+                                setState(() {
+                                  sortFilterName = 'new';
+                                });
+                                break;
+                              case SortType.priceHigh:
+                                setState(() {
+                                  sortFilterName = 'high price';
+                                });
+                                break;
+                              case SortType.priceLow:
+                                setState(() {
+                                  sortFilterName = 'low price';
+                                });
+                                break;
+                            }
+                          },
+                        );
+                      }
+                    },
+                  ),
+                  SortingButton(
+                    title: "Filter",
+                    subtitle: filterColors.isEmpty
+                        ? "not selected"
+                        : "${filteredProducts(productsListBySearch, filterColors).length} items found",
+                    icon: const Icon(Icons.filter_alt_sharp),
+                    press: () async {
+                      final value = await Navigator.of(context).pushNamed(
+                          FiltersScreen.routeName,
+                          arguments: filterColors) as List<Color>?;
+                      if (value != null) {
+                        setState(() {
+                          filterColors = value;
+                        });
+                      }
+                    },
+                  ),
+                ],
               ),
             ),
-            child: Row(
-              children: [
-                SortingButton(
-                  title: "Sorting",
-                  subtitle: "by $sortFilterName",
-                  icon: const Icon(Icons.swap_vert),
-                  press: () async {
-                    final value = await Navigator.of(context).pushNamed(
-                        SortingScreen.routeName,
-                        arguments: sortFilter) as SortType?;
-                    if (value != null) {
-                      setState(
-                        () {
-                          sortFilter = value;
-                          switch (sortFilter) {
-                            case SortType.popular:
-                              setState(() {
-                                sortFilterName = 'popular';
-                              });
-                              break;
-                            case SortType.newProduct:
-                              setState(() {
-                                sortFilterName = 'new';
-                              });
-                              break;
-                            case SortType.priceHigh:
-                              setState(() {
-                                sortFilterName = 'high price';
-                              });
-                              break;
-                            case SortType.priceLow:
-                              setState(() {
-                                sortFilterName = 'low price';
-                              });
-                              break;
-                          }
-                        },
-                      );
-                    }
-                  },
-                ),
-                SortingButton(
-                  title: "Filter",
-                  subtitle: filterColors.isEmpty
-                      ? "not selected"
-                      : "${filteredProducts(productsListBySearch, filterColors).length} items found",
-                  icon: const Icon(Icons.filter_alt_sharp),
-                  press: () async {
-                    final value = await Navigator.of(context).pushNamed(
-                        FiltersScreen.routeName,
-                        arguments: filterColors) as List<Color>?;
-                    if (value != null) {
-                      setState(() {
-                        filterColors = value;
-                      });
-                    }
-                  },
-                ),
-              ],
+            SizedBox(height: getProportionateScreenWidth(5)),
+            Expanded(
+              child: ProductsGrid(
+                products: filterColors.isNotEmpty
+                    ? filteredProducts(productsListBySearch, filterColors)
+                    : productsListBySearch,
+              ),
             ),
-          ),
-          SizedBox(height: getProportionateScreenWidth(5)),
-          Expanded(
-            child: ProductsGrid(
-              products: filterColors.isNotEmpty
-                  ? filteredProducts(productsListBySearch, filterColors)
-                  : productsListBySearch,
-            ),
-          ),
-        ],
+          ],
+        ),
+        bottomNavigationBar:
+            CustomNavigationBar(currentIndex: MenuState.catalog.index),
+        
       ),
-      bottomNavigationBar:
-          CustomNavigationBar(currentIndex: MenuState.catalog.index),
     );
   }
 

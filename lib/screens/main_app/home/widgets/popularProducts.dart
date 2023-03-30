@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../routs.dart';
 import '../../../../size_config.dart';
+import '../../../../utils/customPageRouteBuilder.dart';
 import '../../../../widgets/ProductCard.dart';
 import '../../../../widgets/SectionTitle.dart';
 import '../../all_products_screen/all_products_screen.dart';

@@ -38,9 +38,17 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
   ) async {
     List<Product> products = state.items;
     final index = products.indexWhere((element) => element.id == event.id);
-    final finalBool = await _productsRepository.toggleFavoriteStatus(
-        isFavorite: products[index].isFavorite, id: event.id);
-    products[index] = products[index].copyWithNewFav(finalBool);
+    final originFav = products[index].isFavorite;
+    //temp fav bool
+    products[index] = products[index].copyWithNewFav(!originFav);
     emit(state.copyWith(items: products));
+
+    //final fav bool
+    final finalBool = await _productsRepository.toggleFavoriteStatus(
+        isFavorite: originFav, id: event.id);
+    if (finalBool != products[index].isFavorite) {
+      products[index] = products[index].copyWithNewFav(finalBool);
+      emit(state.copyWith(items: products));
+    }
   }
 }

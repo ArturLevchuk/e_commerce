@@ -11,45 +11,80 @@ import 'login_success_screen.dart';
 import 'widgets/erros_show.dart';
 import 'widgets/FormError.dart';
 
-class CompleteProfileScreen extends StatelessWidget {
+class CompleteProfileScreen extends StatefulWidget {
   const CompleteProfileScreen({super.key});
   static const routeName = "/CompleteProfileScreen";
+
+  @override
+  State<CompleteProfileScreen> createState() => _CompleteProfileScreenState();
+}
+
+class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
+  List<FocusNode> _focusNodes = [];
+  bool _hasFocus = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _getFocusNodes();
+    });
+  }
+
+  void _getFocusNodes() {
+    final focusScope = FocusScope.of(context);
+    _focusNodes = focusScope.descendants.whereType<FocusNode>().toList();
+    for (var focusNode in _focusNodes) {
+      focusNode.addListener(() {
+        setState(() {
+          _hasFocus = focusNode.hasFocus;
+        });
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final args =
         ModalRoute.of(context)!.settings.arguments as Map<String, String>;
-
-    return Scaffold(
-      appBar: newAppBar(),
-      body: SingleChildScrollView(
-        child: Container(
-          width: double.infinity,
-          padding:
-              EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(20)),
-          child: Column(
-            children: [
-              Text(
-                "Complete Profile",
-                style: TextStyle(
-                    color: Colors.black,
-                    fontSize: getProportionateScreenWidth(28),
-                    fontWeight: FontWeight.bold),
-              ),
-              const Text(
-                "Complete your details or continue\nwith social media",
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: SizeConfig.screenHeight * 0.04),
-              CompleteProfileForm(args: args),
-              SizedBox(height: SizeConfig.screenHeight * 0.02),
-              const Text(
-                "By continuing your confirm that you agree with our Term and Condition",
-                style: TextStyle(color: kTextColor),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: SizeConfig.screenHeight * 0.04),
-            ],
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      child: Scaffold(
+        appBar: newAppBar(),
+        body: SingleChildScrollView(
+          physics: _hasFocus
+              ? const BouncingScrollPhysics()
+              : const NeverScrollableScrollPhysics(),
+          child: Container(
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(
+                horizontal: getProportionateScreenWidth(20)),
+            child: Column(
+              children: [
+                Text(
+                  "Complete Profile",
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontSize: getProportionateScreenWidth(28),
+                      fontWeight: FontWeight.bold),
+                ),
+                const Text(
+                  "Complete your details or continue\nwith social media",
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: SizeConfig.screenHeight * 0.04),
+                CompleteProfileForm(args: args),
+                SizedBox(height: SizeConfig.screenHeight * 0.02),
+                const Text(
+                  "By continuing your confirm that you agree with our Term and Condition",
+                  style: TextStyle(color: kTextColor),
+                  textAlign: TextAlign.center,
+                ),
+                // SizedBox(height: SizeConfig.screenHeight * 0.04),
+              ],
+            ),
           ),
         ),
       ),
@@ -59,6 +94,12 @@ class CompleteProfileScreen extends StatelessWidget {
   AppBar newAppBar() {
     return AppBar(
       centerTitle: true,
+      leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios),
+          splashRadius: getProportionateScreenWidth(25),
+          onPressed: () {
+            Navigator.of(context).pop();
+          }),
       title: const Text(
         "Sign Up",
         style: TextStyle(color: Color(0XFF8B8B8B), fontSize: 18),
@@ -82,77 +123,93 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
   String phoneNumber = '';
   String adress = '';
   bool isLoading = false;
+  final FocusNode _nameFocusNode = FocusNode();
+  final FocusNode _phoneFocusNode = FocusNode();
+  final FocusNode _adressFocusNode = FocusNode();
+
+  @override
+  void dispose() {
+    _nameFocusNode.dispose();
+    _phoneFocusNode.dispose();
+    _adressFocusNode.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Form(
       key: _formKey,
-      child: Column(
-        children: [
-          buildNameField(),
-          SizedBox(height: getProportionateScreenHeight(30)),
-          buildPhoneNumberField(),
-          SizedBox(height: getProportionateScreenHeight(30)),
-          buildAdressField(),
-          SizedBox(height: getProportionateScreenHeight(20)),
-          FormError(errors: errors),
-          SizedBox(
-              height: errors.isNotEmpty
-                  ? SizeConfig.screenHeight * 0.05
-                  : SizeConfig.screenHeight * 0.14),
-          isLoading
-              ? const CircularProgressIndicator(color: kPrimaryColor)
-              : DefaultButton(
-                  text: "Continue",
-                  press: () async {
-                    setState(() {
-                      isLoading = true;
-                    });
-                    if (_formKey.currentState!.validate()) {
-                      if (errors.isEmpty) {
-                        _formKey.currentState?.save();
-                        try {
-                          await RepositoryProvider.of<AuthRepositiry>(context,
-                                  listen: false)
-                              .signup({
-                            'email': widget.args['email'] as String,
-                            'password': widget.args['password'] as String,
-                            'name': name,
-                            'phoneNumber': phoneNumber,
-                            'adress': adress,
-                          });
-                        } on HttpException catch (err) {
-                          showErrorDialog(context, err.toString());
-                        } catch (err) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(err.toString())));
-                        } finally {
-                          if (RepositoryProvider.of<AuthRepositiry>(context,
-                                  listen: false)
-                              .isAuth) {
-                            setState(() {
-                              isLoading = false;
+      child: SizedBox(
+        height: SizeConfig.screenHeight * 0.63,
+        child: Column(
+          children: [
+            buildNameField(),
+            SizedBox(height: getProportionateScreenHeight(30)),
+            buildPhoneNumberField(),
+            SizedBox(height: getProportionateScreenHeight(30)),
+            buildAdressField(),
+            SizedBox(height: getProportionateScreenHeight(20)),
+            FormError(errors: errors),
+            const Spacer(),
+            isLoading
+                ? const CircularProgressIndicator(color: kPrimaryColor)
+                : DefaultButton(
+                    text: "Continue",
+                    press: () async {
+                      setState(() {
+                        isLoading = true;
+                      });
+                      if (_formKey.currentState!.validate()) {
+                        if (errors.isEmpty) {
+                          _formKey.currentState?.save();
+                          try {
+                            await RepositoryProvider.of<AuthRepositiry>(context,
+                                    listen: false)
+                                .signup({
+                              'email': widget.args['email'] as String,
+                              'password': widget.args['password'] as String,
+                              'name': name,
+                              'phoneNumber': phoneNumber,
+                              'adress': adress,
                             });
-                            Navigator.of(context).pushReplacementNamed(
-                                LoginSuccessScreen.routeName);
+                          } on HttpException catch (err) {
+                            showErrorDialog(context, err.toString());
+                          } catch (err) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(err.toString())));
+                          } finally {
+                            if (RepositoryProvider.of<AuthRepositiry>(context,
+                                    listen: false)
+                                .isAuth) {
+                              setState(() {
+                                isLoading = false;
+                              });
+                              Navigator.of(context).pushReplacementNamed(
+                                  LoginSuccessScreen.routeName);
+                            }
                           }
                         }
                       }
-                    }
-                    setState(() {
-                      isLoading = false;
-                    });
-                  },
-                ),
-        ],
+                      setState(() {
+                        isLoading = false;
+                      });
+                    },
+                  ),
+          ],
+        ),
       ),
     );
   }
 
   TextFormField buildAdressField() {
     return TextFormField(
+      focusNode: _adressFocusNode,
       keyboardType: TextInputType.streetAddress,
-      decoration: const InputDecoration(
+      decoration: InputDecoration(
+        focusedBorder: Theme.of(context)
+            .inputDecorationTheme
+            .border
+            ?.copyWith(borderSide: const BorderSide(color: kPrimaryColor)),
         label: Text(
           "Adress",
           style: TextStyle(color: kTextColor),
@@ -184,12 +241,16 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
 
   TextFormField buildPhoneNumberField() {
     return TextFormField(
+      focusNode: _phoneFocusNode,
       keyboardType: TextInputType.phone,
       inputFormatters: [
-        // FilteringTextInputFormatter.allow(phoneValidatorRegExp),
         LengthLimitingTextInputFormatter(13),
       ],
-      decoration: const InputDecoration(
+      decoration: InputDecoration(
+        focusedBorder: Theme.of(context)
+            .inputDecorationTheme
+            .border
+            ?.copyWith(borderSide: const BorderSide(color: kPrimaryColor)),
         label: Text(
           "Phone number",
           style: TextStyle(color: kTextColor),
@@ -230,8 +291,13 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
 
   TextFormField buildNameField() {
     return TextFormField(
+      focusNode: _nameFocusNode,
       keyboardType: TextInputType.name,
-      decoration: const InputDecoration(
+      decoration: InputDecoration(
+        focusedBorder: Theme.of(context)
+            .inputDecorationTheme
+            .border
+            ?.copyWith(borderSide: const BorderSide(color: kPrimaryColor)),
         label: Text(
           "Full Name",
           style: TextStyle(color: kTextColor),

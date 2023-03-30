@@ -2,19 +2,10 @@ import 'package:e_commerce/constants.dart';
 import 'package:e_commerce/size_config.dart';
 import 'package:e_commerce/widgets/SectionTitle.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../widgets/DefaultButton.dart';
-
-List<Color> colorFilter = const [
-  Color(0xFFF6625E),
-  Color(0xFF836DB8),
-  Color(0xFFDECB9C),
-  Color(0xFFFFFFFF),
-  Color(0xFFb00b69),
-  Color(0xFF162a40),
-  Color(0xFFffbf00),
-  Color(0xFF11037d),
-];
+import '../home/products_bloc/products_bloc.dart';
 
 class FiltersScreen extends StatefulWidget {
   const FiltersScreen({super.key});
@@ -26,6 +17,19 @@ class FiltersScreen extends StatefulWidget {
 
 class _FiltersScreenState extends State<FiltersScreen> {
   late List<Color> filterColors;
+  late Set<Color> avaliableColors;
+
+  @override
+  void initState() {
+    final listOfListOfColors = context
+        .read<ProductsBloc>()
+        .state
+        .items
+        .map((product) => product.colors)
+        .toList();
+    avaliableColors = listOfListOfColors.expand((list) => list).toSet();
+    super.initState();
+  }
 
   @override
   void didChangeDependencies() {
@@ -56,7 +60,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
               spacing: getProportionateScreenWidth(10),
               runSpacing: getProportionateScreenWidth(10),
               children: [
-                ...colorFilter.map(
+                ...avaliableColors.map(
                   (color) => ColorChooseBlock(
                     color: color,
                     checked: filterColors.contains(color),
@@ -139,13 +143,8 @@ class _ColorChooseBlockState extends State<ColorChooseBlock> {
         duration: defaultDuration,
         width: getProportionateScreenWidth(47),
         height: getProportionateScreenWidth(47),
-        padding: widget.checked
-            ? EdgeInsets.all(
-                getProportionateScreenWidth(2),
-              )
-            : null,
         decoration: BoxDecoration(
-          color: widget.checked ? Colors.white : widget.color,
+          color: Colors.white,
           boxShadow: const [
             BoxShadow(
               color: Colors.black,
@@ -155,15 +154,19 @@ class _ColorChooseBlockState extends State<ColorChooseBlock> {
           border:
               widget.checked ? Border.all(width: 1, color: Colors.black) : null,
         ),
-        child: widget.checked
-            ? Container(
-                decoration: BoxDecoration(
-                  color: widget.color,
-                  border: Border.all(width: 1, color: Colors.black),
-                ),
-                child: const Icon(Icons.check),
-              )
-            : null,
+        child: AnimatedPadding(
+          duration: defaultDuration,
+          padding: widget.checked ? const EdgeInsets.all(2.0) : EdgeInsets.zero,
+          child: Container(
+            decoration: BoxDecoration(
+              color: widget.color,
+              border: widget.checked
+                  ? Border.all(width: 1, color: Colors.black)
+                  : null,
+            ),
+            child: widget.checked ? const Icon(Icons.check) : null,
+          ),
+        ),
       ),
     );
   }

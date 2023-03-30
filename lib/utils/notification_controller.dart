@@ -29,7 +29,7 @@ class NotificationController {
             body: receivedNotification.body,
             category: NotificationCategory.Reminder,
           ),
-          schedule: NotificationInterval(interval: 60, repeats: false),
+          schedule: NotificationInterval(interval: 60 * 5, repeats: false),
         );
       } else {
         AwesomeNotifications()

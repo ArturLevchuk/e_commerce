@@ -14,55 +14,61 @@ class SignUpScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: newAppBar(context),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding:
-              EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(20)),
-          child: Column(
-            children: [
-              Text(
-                "Register Account",
-                style: TextStyle(
-                    color: Colors.black,
-                    fontSize: getProportionateScreenWidth(28),
-                    fontWeight: FontWeight.bold),
-              ),
-              const Text(
-                "Complete your details or continue\nwith social media",
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: SizeConfig.screenHeight * 0.01),
-              const SignUpForm(),
-              SizedBox(height: SizeConfig.screenHeight * 0.05),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SocialCard(
-                    icon: "assets/icons/facebook-2.svg",
-                    press: () {},
-                  ),
-                  SocialCard(
-                    icon: "assets/icons/google-icon.svg",
-                    press: () {},
-                  ),
-                  SocialCard(
-                    icon: "assets/icons/twitter.svg",
-                    press: () {},
-                  ),
-                ],
-              ),
-              SizedBox(height: getProportionateScreenHeight(20)),
-              Text(
-                "By continuing you confirm that you agree\nwith our Term and Condition",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    color: kTextColor,
-                    fontSize: getProportionateScreenWidth(12)),
-              ),
-              SizedBox(height: getProportionateScreenHeight(10)),
-            ],
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      child: Scaffold(
+        appBar: newAppBar(context),
+        body: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+                horizontal: getProportionateScreenWidth(20)),
+            child: Column(
+              children: [
+                Text(
+                  "Register Account",
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontSize: getProportionateScreenWidth(28),
+                      fontWeight: FontWeight.bold),
+                ),
+                const Text(
+                  "Complete your details or continue\nwith social media",
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: SizeConfig.screenHeight * 0.01),
+                const SignUpForm(),
+                SizedBox(height: SizeConfig.screenHeight * 0.05),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SocialCard(
+                      icon: "assets/icons/facebook-2.svg",
+                      press: () {},
+                    ),
+                    SocialCard(
+                      icon: "assets/icons/google-icon.svg",
+                      press: () {},
+                    ),
+                    SocialCard(
+                      icon: "assets/icons/twitter.svg",
+                      press: () {},
+                    ),
+                  ],
+                ),
+                SizedBox(height: getProportionateScreenHeight(20)),
+                Text(
+                  "By continuing you confirm that you agree\nwith our Term and Condition",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: kTextColor,
+                      fontSize: getProportionateScreenWidth(12)),
+                ),
+                SizedBox(height: getProportionateScreenHeight(10)),
+              ],
+            ),
           ),
         ),
       ),
@@ -96,11 +102,22 @@ class SignUpForm extends StatefulWidget {
 class _SignUpFormState extends State<SignUpForm> {
   final _formKey = GlobalKey<FormState>();
   final List<String> errors = [];
-  String confirm_password = "";
+  String confirmPassword = "";
   Map<String, String> signUpInf = {
     'email': '',
     'password': '',
   };
+  final FocusNode _emailFocusNode = FocusNode();
+  final FocusNode _passFocusNode = FocusNode();
+  final FocusNode _confirmPassFocusNode = FocusNode();
+
+  @override
+  void dispose() {
+    _emailFocusNode.dispose();
+    _passFocusNode.dispose();
+    _confirmPassFocusNode.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -137,20 +154,25 @@ class _SignUpFormState extends State<SignUpForm> {
 
   TextFormField buildConfirmPasswordFormField() {
     return TextFormField(
-      decoration: const InputDecoration(
-        label: Text(
+      focusNode: _confirmPassFocusNode,
+      decoration: InputDecoration(
+        focusedBorder: Theme.of(context)
+            .inputDecorationTheme
+            .border
+            ?.copyWith(borderSide: const BorderSide(color: kPrimaryColor)),
+        label: const Text(
           "Confirm Password",
           style: TextStyle(color: kTextColor),
         ),
         hintText: "Re-enter your Password",
-        suffixIcon: CustomSuffixIcon(svgIcon: "assets/icons/Lock.svg"),
+        suffixIcon: const CustomSuffixIcon(svgIcon: "assets/icons/Lock.svg"),
       ),
       obscureText: true,
       onSaved: (newValue) {
-        confirm_password = newValue!;
+        confirmPassword = newValue!;
       },
       validator: (value) {
-        if (signUpInf['password'] != confirm_password &&
+        if (signUpInf['password'] != confirmPassword &&
             !errors.contains(kMatchPassError)) {
           setState(() {
             errors.add(kMatchPassError);
@@ -159,8 +181,8 @@ class _SignUpFormState extends State<SignUpForm> {
         return null;
       },
       onChanged: (value) {
-        confirm_password = value;
-        if (signUpInf['password'] == confirm_password &&
+        confirmPassword = value;
+        if (signUpInf['password'] == confirmPassword &&
             errors.contains(kMatchPassError)) {
           setState(() {
             errors.remove(kMatchPassError);
@@ -172,14 +194,19 @@ class _SignUpFormState extends State<SignUpForm> {
 
   TextFormField buildEmailFormField() {
     return TextFormField(
+      focusNode: _emailFocusNode,
       keyboardType: TextInputType.emailAddress,
-      decoration: const InputDecoration(
-        label: Text(
+      decoration: InputDecoration(
+        focusedBorder: Theme.of(context)
+            .inputDecorationTheme
+            .border
+            ?.copyWith(borderSide: const BorderSide(color: kPrimaryColor)),
+        label: const Text(
           "Email",
           style: TextStyle(color: kTextColor),
         ),
         hintText: "Enter your email",
-        suffixIcon: CustomSuffixIcon(svgIcon: "assets/icons/Mail.svg"),
+        suffixIcon: const CustomSuffixIcon(svgIcon: "assets/icons/Mail.svg"),
       ),
       onSaved: (newValue) {
         signUpInf['email'] = newValue!;
@@ -214,13 +241,18 @@ class _SignUpFormState extends State<SignUpForm> {
 
   TextFormField buildPasswordFormField() {
     return TextFormField(
-      decoration: const InputDecoration(
-        label: Text(
+      focusNode: _passFocusNode,
+      decoration: InputDecoration(
+        focusedBorder: Theme.of(context)
+            .inputDecorationTheme
+            .border
+            ?.copyWith(borderSide: const BorderSide(color: kPrimaryColor)),
+        label: const Text(
           "Password",
           style: TextStyle(color: kTextColor),
         ),
         hintText: "Enter your Password",
-        suffixIcon: CustomSuffixIcon(svgIcon: "assets/icons/Lock.svg"),
+        suffixIcon: const CustomSuffixIcon(svgIcon: "assets/icons/Lock.svg"),
       ),
       obscureText: true,
       onSaved: (newValue) {

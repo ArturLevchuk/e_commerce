@@ -18,7 +18,7 @@ class _SplashScreenState extends State<SplashScreen> {
   int currentPage = 0;
   final PageController pageController = PageController();
   late Timer animTimer;
-  List<Map<String, String>> splashData = [
+  final List<Map<String, String>> splashData = [
     {
       "text": "Welcome to Ecommerce, Let’s shop!",
       "image": "assets/images/splash_1.png"
@@ -45,7 +45,7 @@ class _SplashScreenState extends State<SplashScreen> {
         );
       } else {
         pageController.animateToPage(
-          0,
+          pageController.initialPage,
           duration: defaultDuration,
           curve: Curves.easeInOut,
         );
@@ -71,6 +71,7 @@ class _SplashScreenState extends State<SplashScreen> {
               Expanded(
                 flex: 3,
                 child: PageView.builder(
+                  physics: const BouncingScrollPhysics(),
                   itemBuilder: (context, index) => SplashContent(
                     text: splashData[index]['text']!,
                     image: splashData[index]['image']!,
@@ -165,10 +166,13 @@ class SplashContent extends StatelessWidget {
           textAlign: TextAlign.center,
         ),
         const Spacer(flex: 2),
-        Image.asset(
-          image,
-          height: getProportionateScreenHeight(265),
-          width: getProportionateScreenWidth(235),
+        AspectRatio(
+          aspectRatio: 1.8,
+          child: Image.asset(
+            image,
+            // height: getProportionateScreenHeight(265),
+            // width: getProportionateScreenWidth(235),
+          ),
         ),
       ],
     );

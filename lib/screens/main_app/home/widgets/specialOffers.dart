@@ -18,6 +18,7 @@ class SpecialOffers extends StatelessWidget {
         ),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
+          physics: const BouncingScrollPhysics(),
           child: Row(
             children: [
               SpecialOfferCard(

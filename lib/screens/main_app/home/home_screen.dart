@@ -47,7 +47,8 @@ class _HomeScreenState extends State<HomeScreen>
             context: context,
             builder: (context) => AlertDialog(
               title: const Text("Allow Notifications"),
-              content: const Text('Our app would like to send you notifications'),
+              content:
+                  const Text('Our app would like to send you notifications'),
               actions: [
                 TextButton(
                   onPressed: () {
@@ -125,7 +126,9 @@ class _HomeScreenState extends State<HomeScreen>
           children: [
             if (state.productsLoadStatus == ProductsLoadStatus.loaded)
               Scaffold(
+                extendBody: true,
                 body: SafeArea(
+                  bottom: false,
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
@@ -137,7 +140,8 @@ class _HomeScreenState extends State<HomeScreen>
                         const SpecialOffers(),
                         SizedBox(height: getProportionateScreenHeight(15)),
                         const PopularProducts(),
-                        SizedBox(height: getProportionateScreenHeight(15)),
+                        const SizedBox(
+                            height: kBottomNavigationBarHeight * 1.2),
                       ],
                     ),
                   ),

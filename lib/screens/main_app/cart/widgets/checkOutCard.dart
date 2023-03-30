@@ -25,15 +25,16 @@ class CheckOutCard extends StatelessWidget {
           padding: EdgeInsets.symmetric(
               vertical: getProportionateScreenWidth(15),
               horizontal: getProportionateScreenWidth(30)),
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             color: Colors.white,
-            borderRadius: const BorderRadius.only(
+            borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(30), topRight: Radius.circular(30)),
             boxShadow: [
               BoxShadow(
-                  offset: const Offset(0, -15),
-                  blurRadius: 20,
-                  color: Colors.black.withOpacity(.08)),
+                  offset: Offset(0, -5),
+                  blurRadius: 5,
+                  color: Colors.black12,
+                  spreadRadius: 0),
             ],
           ),
           child: Column(

@@ -62,7 +62,6 @@ class _UserInformationEditScreenState extends State<UserInformationEditScreen> {
   Widget build(BuildContext context) {
     return !isLoading
         ? Scaffold(
-            backgroundColor: const Color(0xfff5f6f9),
             appBar: customAppBar(context),
             body: Form(
               key: _formKey,

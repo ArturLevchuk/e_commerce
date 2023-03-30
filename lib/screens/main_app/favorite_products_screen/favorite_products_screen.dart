@@ -13,6 +13,7 @@ class FavoriteListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
       appBar: AppBar(
         titleTextStyle: TextStyle(
             color: Colors.black, fontSize: getProportionateScreenWidth(18)),

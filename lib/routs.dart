@@ -21,6 +21,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'screens/main_app/cart/cart_screen.dart';
 import 'screens/main_app/all_products_screen/sorting_screen.dart';
 import 'screens/main_app/user_information_edit_screen.dart';
+import 'utils/customPageRouteBuilder.dart';
 import 'widgets/IconBtnWithCounter.dart';
 
 final Map<String, WidgetBuilder> routes = {
@@ -72,122 +73,109 @@ class _CustomNavigationBarState extends State<CustomNavigationBar> {
         return state.items.length;
       },
       builder: (context, state) {
-        return BottomNavigationBar(
-          showSelectedLabels: false,
-          showUnselectedLabels: false,
-          selectedFontSize: 0,
-          unselectedFontSize: 0,
-          currentIndex: widget.currentIndex,
-          type: BottomNavigationBarType.fixed,
-          onTap: (value) {
-            if (value == MenuState.home.index) {
-              Navigator.of(context).pushReplacement(
-                customPageRouteBuilder(moveTo: const HomeScreen()),
-              );
-            } else if (value == MenuState.profile.index) {
-              Navigator.of(context).pushReplacement(
-                customPageRouteBuilder(moveTo: const ProfileScreen()),
-              );
-            } else if (value == MenuState.favourite.index) {
-              Navigator.of(context).pushReplacement(
-                customPageRouteBuilder(moveTo: const FavoriteListScreen()),
-              );
-            } else if (value == MenuState.cart.index) {
-              Navigator.of(context).pushReplacement(
-                customPageRouteBuilder(moveTo: const CartScreen()),
-              );
-            } else if (value == MenuState.catalog.index) {
-              Navigator.of(context).pushReplacement(
-                customPageRouteBuilder(moveTo: const AllProductsScreen()),
-              );
-            }
-          },
-          items: [
-            BottomNavigationBarItem(
-              label: "",
-              icon: SvgPicture.asset(
-                "assets/icons/Shop Icon.svg",
-                color: Colors.grey,
-              ),
-              activeIcon: SvgPicture.asset(
-                "assets/icons/Shop Icon.svg",
-              ),
+        return Container(
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.only(
+                topRight: Radius.circular(20), topLeft: Radius.circular(20)),
+            boxShadow: [
+              BoxShadow(color: Colors.black38, spreadRadius: 0, blurRadius: 5),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
             ),
-            BottomNavigationBarItem(
-              label: "",
-              icon: SvgPicture.asset(
-                "assets/icons/Discover.svg",
-                color: Colors.grey,
-              ),
-              activeIcon: SvgPicture.asset(
-                "assets/icons/Discover.svg",
-              ),
+            child: BottomNavigationBar(
+              showSelectedLabels: false,
+              showUnselectedLabels: false,
+              selectedFontSize: 0,
+              unselectedFontSize: 0,
+              currentIndex: widget.currentIndex,
+              type: BottomNavigationBarType.fixed,
+              onTap: (value) {
+                if (value == MenuState.home.index) {
+                  Navigator.of(context).pushReplacement(
+                    customPageRouteBuilder(moveTo: const HomeScreen()),
+                  );
+                } else if (value == MenuState.profile.index) {
+                  Navigator.of(context).pushReplacement(
+                    customPageRouteBuilder(moveTo: const ProfileScreen()),
+                  );
+                } else if (value == MenuState.favourite.index) {
+                  Navigator.of(context).pushReplacement(
+                    customPageRouteBuilder(moveTo: const FavoriteListScreen()),
+                  );
+                } else if (value == MenuState.cart.index) {
+                  Navigator.of(context).pushReplacement(
+                    customPageRouteBuilder(moveTo: const CartScreen()),
+                  );
+                } else if (value == MenuState.catalog.index) {
+                  Navigator.of(context).pushReplacement(
+                    customPageRouteBuilder(moveTo: const AllProductsScreen()),
+                  );
+                }
+              },
+              items: [
+                BottomNavigationBarItem(
+                  label: "",
+                  icon: SvgPicture.asset(
+                    "assets/icons/Shop Icon.svg",
+                    color: Colors.grey,
+                  ),
+                  activeIcon: SvgPicture.asset(
+                    "assets/icons/Shop Icon.svg",
+                  ),
+                ),
+                BottomNavigationBarItem(
+                  label: "",
+                  icon: SvgPicture.asset(
+                    "assets/icons/Discover.svg",
+                    color: Colors.grey,
+                  ),
+                  activeIcon: SvgPicture.asset(
+                    "assets/icons/Discover.svg",
+                  ),
+                ),
+                BottomNavigationBarItem(
+                  label: "",
+                  icon: SvgPicture.asset(
+                    "assets/icons/Heart Icon.svg",
+                    color: Colors.grey,
+                  ),
+                  activeIcon: SvgPicture.asset(
+                    "assets/icons/Heart Icon.svg",
+                    color: kPrimaryColor,
+                  ),
+                ),
+                BottomNavigationBarItem(
+                  label: "",
+                  icon: IconWithCounter(
+                    svgSrc: "assets/icons/Cart Icon.svg",
+                    numOfItems: state,
+                  ),
+                  activeIcon: IconWithCounter(
+                    svgSrc: "assets/icons/Cart Icon.svg",
+                    numOfItems: state,
+                    color: kPrimaryColor,
+                  ),
+                ),
+                BottomNavigationBarItem(
+                  label: "",
+                  icon: SvgPicture.asset(
+                    "assets/icons/User Icon.svg",
+                    color: Colors.grey,
+                  ),
+                  activeIcon: SvgPicture.asset(
+                    "assets/icons/User Icon.svg",
+                    color: kPrimaryColor,
+                  ),
+                ),
+              ],
             ),
-            BottomNavigationBarItem(
-              label: "",
-              icon: SvgPicture.asset(
-                "assets/icons/Heart Icon.svg",
-                color: Colors.grey,
-              ),
-              activeIcon: SvgPicture.asset(
-                "assets/icons/Heart Icon.svg",
-                color: kPrimaryColor,
-              ),
-            ),
-            BottomNavigationBarItem(
-              label: "",
-              icon: IconWithCounter(
-                svgSrc: "assets/icons/Cart Icon.svg",
-                numOfItems: state,
-              ),
-              activeIcon: IconWithCounter(
-                svgSrc: "assets/icons/Cart Icon.svg",
-                numOfItems: state,
-                color: kPrimaryColor,
-              ),
-            ),
-            BottomNavigationBarItem(
-              label: "",
-              icon: SvgPicture.asset(
-                "assets/icons/User Icon.svg",
-                color: Colors.grey,
-              ),
-              activeIcon: SvgPicture.asset(
-                "assets/icons/User Icon.svg",
-                color: kPrimaryColor,
-              ),
-            ),
-          ],
+          ),
         );
       },
     );
   }
-}
-
-PageRouteBuilder customPageRouteBuilder(
-    {required Widget moveTo, dynamic arguments}) {
-  return PageRouteBuilder(
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      // animation =
-      //     CurvedAnimation(parent: animation, curve: Curves.elasticInOut);
-
-      // return ScaleTransition(
-      //   scale: animation,
-      //   alignment: Alignment.center,
-      //   child: child,
-      // );
-      return FadeTransition(opacity: animation, child: child);
-      // return SlideTransition(
-      //   position: Tween<Offset>(
-      //     begin: const Offset(-1.0, 0.0),
-      //     end: Offset.zero,
-      //   ).animate(animation),
-      //   child: child,
-      // );
-    },
-    pageBuilder: (context, animation, secondaryAnimation) {
-      return moveTo;
-    },
-    settings: RouteSettings(arguments: arguments),
-  );
 }
