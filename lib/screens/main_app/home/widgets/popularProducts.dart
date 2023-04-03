@@ -15,9 +15,7 @@ class PopularProducts extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final prov = Provider.of<Products>(context, listen: false);
     final productsBlocState = context.read<ProductsBloc>().state;
-
     return Column(
       children: [
         SectionTitle(
@@ -25,13 +23,14 @@ class PopularProducts extends StatelessWidget {
           press: () {
             Navigator.of(context).pushReplacement(
               customPageRouteBuilder(
-                moveTo: AllProductsScreen(),
+                moveTo: const AllProductsScreen(),
               ),
             );
           },
         ),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
+          physics: const BouncingScrollPhysics(),
           child: Row(children: [
             ...List.generate(
               productsBlocState.popularItems.length,

@@ -1,13 +1,43 @@
 import 'package:e_commerce/constants.dart';
-import 'package:e_commerce/screens/main_app/all_products_screen/filter_screen.dart';
-import 'package:e_commerce/screens/main_app/all_products_screen/sorting_screen.dart';
 import 'package:e_commerce/size_config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../repositories/models/product.dart';
 import '../../../routs.dart';
 import '../home/products_bloc/products_bloc.dart';
+import 'products_order_settings_bloc/products_order_settings_bloc.dart';
 import 'utils/sorting_fun.dart';
+import 'widgets/filter_drawer.dart';
+import 'widgets/sorting_drawer.dart';
 import 'widgets/widgets.dart';
+
+enum DrawerScreen { filters, sorting }
+
+Widget? showDrawer(DrawerScreen drawerScreen) {
+  switch (drawerScreen) {
+    case DrawerScreen.filters:
+      return const FilterDrawer();
+    case DrawerScreen.sorting:
+      return const SortingDrawer();
+    default:
+      return null;
+  }
+}
+
+String getSortType(SortType sortType) {
+  switch (sortType) {
+    case SortType.popular:
+      return 'popular';
+    case SortType.newProduct:
+      return 'new';
+    case SortType.priceHigh:
+      return 'high price';
+    case SortType.priceLow:
+      return 'low price';
+    default:
+      return 'unknown';
+  }
+}
 
 class AllProductsScreen extends StatefulWidget {
   const AllProductsScreen({super.key});
@@ -20,14 +50,15 @@ class AllProductsScreen extends StatefulWidget {
 class _AllProductsScreenState extends State<AllProductsScreen> {
   late TextEditingController textEditingController;
   late FocusNode textFieldFocusNode;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   bool clearField = false;
-  SortType sortFilter = SortType.popular;
-  String sortFilterName = 'popular';
-  List<Color> filterColors = [];
+  DrawerScreen drawerScreen = DrawerScreen.sorting;
+
+  late final List<Product> allProducts;
 
   @override
   void initState() {
-    super.initState();
+    allProducts = context.read<ProductsBloc>().state.items;
     textEditingController = TextEditingController();
     textEditingController.addListener(() {
       if (textEditingController.text.length > 2) {
@@ -44,6 +75,7 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
     textFieldFocusNode.addListener(() {
       setState(() {});
     });
+    super.initState();
   }
 
   @override
@@ -55,98 +87,75 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final allProducts = context.read<ProductsBloc>().state.items;
-    final productsListBySearch =
-        productsBySearch(allProducts, textEditingController.text, sortFilter);
-    return GestureDetector(
-      onTap: () {
-        FocusScope.of(context).unfocus();
-      },
-      child: Scaffold(
-        extendBody: true,
-        appBar: newAppBar(),
-        body: Column(
-          children: [
-            DecoratedBox(
-              decoration: const BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(color: Colors.black12),
-                ),
-              ),
-              child: Row(
+    return BlocProvider(
+      create: (context) => ProductsOrderSettingsBloc(),
+      child: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).unfocus();
+        },
+        child:
+            BlocBuilder<ProductsOrderSettingsBloc, ProductsOrderSettingsState>(
+          builder: (context, state) {
+            final productsListBySearch = productsBySearch(
+                allProducts, textEditingController.text, state.sortFilter);
+            return Scaffold(
+              key: _scaffoldKey,
+              extendBody: true,
+              appBar: newAppBar(),
+              body: Column(
                 children: [
-                  SortingButton(
-                    title: "Sorting",
-                    subtitle: "by $sortFilterName",
-                    icon: const Icon(Icons.swap_vert),
-                    press: () async {
-                      final value = await Navigator.of(context).pushNamed(
-                          SortingScreen.routeName,
-                          arguments: sortFilter) as SortType?;
-                      if (value != null) {
-                        setState(
-                          () {
-                            sortFilter = value;
-                            switch (sortFilter) {
-                              case SortType.popular:
-                                setState(() {
-                                  sortFilterName = 'popular';
-                                });
-                                break;
-                              case SortType.newProduct:
-                                setState(() {
-                                  sortFilterName = 'new';
-                                });
-                                break;
-                              case SortType.priceHigh:
-                                setState(() {
-                                  sortFilterName = 'high price';
-                                });
-                                break;
-                              case SortType.priceLow:
-                                setState(() {
-                                  sortFilterName = 'low price';
-                                });
-                                break;
-                            }
+                  DecoratedBox(
+                    decoration: const BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(color: Colors.black12),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        SortingButton(
+                          title: "Sorting",
+                          subtitle: "by ${getSortType(state.sortFilter)}",
+                          icon: const Icon(Icons.swap_vert),
+                          press: () async {
+                            setState(() {
+                              drawerScreen = DrawerScreen.sorting;
+                            });
+                            _scaffoldKey.currentState?.openEndDrawer();
                           },
-                        );
-                      }
-                    },
+                        ),
+                        SortingButton(
+                          title: "Filter",
+                          subtitle: state.filterColors.isEmpty
+                              ? "not selected"
+                              : "${filteredProducts(productsListBySearch, state.filterColors).length} items found",
+                          icon: const Icon(Icons.filter_alt_sharp),
+                          press: () async {
+                            setState(() {
+                              drawerScreen = DrawerScreen.filters;
+                            });
+                            _scaffoldKey.currentState?.openEndDrawer();
+                          },
+                        ),
+                      ],
+                    ),
                   ),
-                  SortingButton(
-                    title: "Filter",
-                    subtitle: filterColors.isEmpty
-                        ? "not selected"
-                        : "${filteredProducts(productsListBySearch, filterColors).length} items found",
-                    icon: const Icon(Icons.filter_alt_sharp),
-                    press: () async {
-                      final value = await Navigator.of(context).pushNamed(
-                          FiltersScreen.routeName,
-                          arguments: filterColors) as List<Color>?;
-                      if (value != null) {
-                        setState(() {
-                          filterColors = value;
-                        });
-                      }
-                    },
+                  SizedBox(height: getProportionateScreenWidth(5)),
+                  Expanded(
+                    child: ProductsGrid(
+                      products: state.filterColors.isNotEmpty
+                          ? filteredProducts(
+                              productsListBySearch, state.filterColors)
+                          : productsListBySearch,
+                    ),
                   ),
                 ],
               ),
-            ),
-            SizedBox(height: getProportionateScreenWidth(5)),
-            Expanded(
-              child: ProductsGrid(
-                products: filterColors.isNotEmpty
-                    ? filteredProducts(productsListBySearch, filterColors)
-                    : productsListBySearch,
-              ),
-            ),
-          ],
+              bottomNavigationBar:
+                  CustomNavigationBar(currentIndex: MenuState.catalog.index),
+              endDrawer: showDrawer(drawerScreen),
+            );
+          },
         ),
-        bottomNavigationBar:
-            CustomNavigationBar(currentIndex: MenuState.catalog.index),
-        
       ),
     );
   }
@@ -154,6 +163,7 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
   AppBar newAppBar() {
     return AppBar(
       elevation: 1,
+      actions: const [SizedBox.shrink()],
       title: TextField(
         focusNode: textFieldFocusNode,
         controller: textEditingController,

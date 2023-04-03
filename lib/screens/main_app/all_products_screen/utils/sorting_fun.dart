@@ -1,6 +1,6 @@
 import 'dart:ui';
 import '../../../../repositories/models/product.dart';
-import '../sorting_screen.dart';
+import '../products_order_settings_bloc/products_order_settings_bloc.dart';
 
 List<Product> productsBySearch(
     List<Product> allProducts, String searchTag, SortType sortFilter) {
