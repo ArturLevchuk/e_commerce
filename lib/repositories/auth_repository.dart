@@ -69,8 +69,10 @@ class AuthRepositiry {
           'adress': args['adress'],
         }),
       );
+    } on DioError catch (err) {
+      throw HttpException((err).response?.data['error']['message']);
     } catch (err) {
-      throw HttpException((err as DioError).response?.data['error']['message']);
+      rethrow;
     }
   }
 
@@ -78,7 +80,7 @@ class AuthRepositiry {
     try {
       await _authenticate(email, password, 'signInWithPassword', remember);
     } catch (err) {
-      throw HttpException((err as DioError).response?.data['error']['message']);
+      rethrow;
     }
   }
 
