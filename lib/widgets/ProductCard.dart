@@ -62,7 +62,10 @@ class ProductCard extends StatelessWidget {
                 const SizedBox(height: 5),
                 Text(
                   product.title,
-                  style: const TextStyle(color: Colors.black),
+                  style: const TextStyle(
+                    color: Colors.black,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                   maxLines: 2,
                 ),
                 const Spacer(),
@@ -84,7 +87,6 @@ class ProductCard extends StatelessWidget {
                               text: "\$${product.prev_price}",
                               style: TextStyle(
                                   fontSize: getProportionateScreenWidth(11.5),
-                                  fontWeight: FontWeight.w600,
                                   color: kSecondaryColor,
                                   decoration: TextDecoration.lineThrough),
                             ),

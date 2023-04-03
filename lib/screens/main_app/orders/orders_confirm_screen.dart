@@ -81,208 +81,233 @@ class _OrdersConfirmScreenState extends State<OrdersConfirmScreen> {
         ? Scaffold(
             appBar: customAppBar(context),
             body: SingleChildScrollView(
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: getProportionateScreenWidth(20),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ShadowBloc(
-                      containerHeight: customArrivePlace
-                          ? getProportionateScreenWidth(220)
-                          : getProportionateScreenWidth(165),
-                      widget: SingleChildScrollView(
-                        child: Column(
+              physics: const NeverScrollableScrollPhysics(),
+              child: SafeArea(
+                child: SizedBox(
+                  width: double.infinity,
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: SizeConfig.screenHeight * 0.75,
+                        child: ListView(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: getProportionateScreenWidth(20),
+                          ),
                           children: [
-                            Text(
-                              "Delivery Adress",
-                              style: Theme.of(context).textTheme.headline6,
-                            ),
-                            RadioListTile(
-                              value: false,
-                              title: const Text("Standart Place"),
-                              subtitle: Text(userInformation!.adress),
-                              groupValue: customArrivePlace,
-                              onChanged: (value) {
-                                setState(() {
-                                  customArrivePlace = value!;
-                                });
-                              },
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20)),
-                              activeColor: kPrimaryColor,
-                            ),
-                            RadioListTile(
-                              value: true,
-                              title: const Text("Custom"),
-                              groupValue: customArrivePlace,
-                              onChanged: (value) {
-                                setState(() {
-                                  customArrivePlace = value!;
-                                });
-                              },
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20)),
-                              activeColor: kPrimaryColor,
-                            ),
-                            if (customArrivePlace)
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 20, right: 20, bottom: 10),
-                                child: Form(
-                                  key: _formKeyArrivePlace,
-                                  child: TextFormField(
-                                    controller: _customArrivePlaceController,
-                                    decoration: const InputDecoration(
-                                      contentPadding: EdgeInsets.zero,
-                                      enabledBorder: UnderlineInputBorder(),
-                                      focusedBorder: UnderlineInputBorder(),
-                                      errorBorder: UnderlineInputBorder(),
-                                      hintText: "Where do you want delivery?",
+                            ShadowBloc(
+                              containerHeight: customArrivePlace
+                                  ? getProportionateScreenWidth(220)
+                                  : getProportionateScreenWidth(165),
+                              widget: SingleChildScrollView(
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      "Delivery Adress",
+                                      style:
+                                          Theme.of(context).textTheme.headline6,
                                     ),
-                                    validator: (value) {
-                                      if (value == null) {
-                                        return "Please enter destination place!";
-                                      }
-                                      if (value.length < 5) {
-                                        return "Please enter destination place!";
-                                      }
-                                      return null;
-                                    },
-                                    onSaved: (newValue) {
-                                      deliveryArrivePlace = newValue!;
-                                    },
-                                  ),
+                                    RadioListTile(
+                                      value: false,
+                                      title: const Text("Standart Place"),
+                                      subtitle: Text(userInformation!.adress),
+                                      groupValue: customArrivePlace,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          customArrivePlace = value!;
+                                        });
+                                      },
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(20)),
+                                      activeColor: kPrimaryColor,
+                                    ),
+                                    RadioListTile(
+                                      value: true,
+                                      title: const Text("Custom"),
+                                      groupValue: customArrivePlace,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          customArrivePlace = value!;
+                                        });
+                                      },
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(20)),
+                                      activeColor: kPrimaryColor,
+                                    ),
+                                    if (customArrivePlace)
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 20, right: 20, bottom: 10),
+                                        child: Form(
+                                          key: _formKeyArrivePlace,
+                                          child: TextFormField(
+                                            controller:
+                                                _customArrivePlaceController,
+                                            decoration: const InputDecoration(
+                                              contentPadding: EdgeInsets.zero,
+                                              enabledBorder:
+                                                  UnderlineInputBorder(),
+                                              focusedBorder:
+                                                  UnderlineInputBorder(),
+                                              errorBorder:
+                                                  UnderlineInputBorder(),
+                                              hintText:
+                                                  "Where do you want delivery?",
+                                            ),
+                                            validator: (value) {
+                                              if (value == null) {
+                                                return "Please enter destination place!";
+                                              }
+                                              if (value.length < 5) {
+                                                return "Please enter destination place!";
+                                              }
+                                              return null;
+                                            },
+                                            onSaved: (newValue) {
+                                              deliveryArrivePlace = newValue!;
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                  ],
                                 ),
                               ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: getProportionateScreenWidth(10),
-                    ),
-                    ShadowBloc(
-                      containerHeight: paymentType == 1
-                          ? getProportionateScreenWidth(150)
-                          : getProportionateScreenWidth(395),
-                      widget: SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            Text(
-                              "Payment method",
-                              style: Theme.of(context).textTheme.headline6,
                             ),
-                            RadioListTile(
-                              value: 1,
-                              title: const Text("Payment upon receipt"),
-                              groupValue: paymentType,
-                              onChanged: (value) {
-                                setState(() {
-                                  paymentType = 1;
-                                });
-                              },
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20)),
-                              activeColor: kPrimaryColor,
-                            ),
-                            RadioListTile(
-                              value: 2,
-                              title: const Text("By Card"),
-                              groupValue: paymentType,
-                              onChanged: (value) {
-                                setState(() {
-                                  paymentType = 2;
-                                });
-                              },
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20)),
-                              activeColor: kPrimaryColor,
-                            ),
-                            if (paymentType == 2) cardIput(),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                          vertical: getProportionateScreenWidth(20)),
-                      child: !orderingProcess
-                          ? DefaultButton(
-                              text: "Make order",
-                              press: () async {
-                                setState(() {
-                                  orderingProcess = true;
-                                });
-                                if (customArrivePlace) {
-                                  if (_formKeyArrivePlace.currentState!
-                                      .validate()) {
-                                    _formKeyArrivePlace.currentState!.save();
-                                  }
-                                } else {
-                                  deliveryArrivePlace = userInformation!.adress;
-                                }
-                                String paymentInf = "Payment upon receipt";
-                                if (paymentType == 2) {
-                                  if (_formKey.currentState!.validate()) {
-                                    _formKey.currentState?.save();
-                                    paymentInf =
-                                        "Card: $cardNum Cvv: $cvv ExpDate: $expdate CardNameHolder: $cardNameHolder";
-                                  }
-                                }
-
-                                try {
-                                  context.read<OrdersBloc>().add(AddOrder(
-                                        cartProducts: cartItemInf["cartItems"],
-                                        totalPrice: cartItemInf["totalPrice"],
-                                        arrivePlace: deliveryArrivePlace,
-                                        payment: paymentInf,
-                                      ));
-                                  final bloc =
-                                      context.read<OrdersBloc>().stream.first;
-                                  context.read<CartBloc>().add(ClearCart());
-                                  await bloc.then((state) {
-                                    if (state.error != null) {
-                                      throw state.error!;
-                                    } else {
-                                      showDialog(
-                                        context: context,
-                                        builder: (_) =>
-                                            const AlertDialogTextWithPic(
-                                          text: "Order is processed!",
-                                          svgSrc:
-                                              "assets/icons/Check mark rounde.svg",
-                                        ),
-                                      ).then((_) {
-                                        Navigator.of(context).pop();
-                                      });
-                                    }
-                                  });
-                                } catch (err) {
-                                  showDialog(
-                                    context: context,
-                                    builder: (_) =>
-                                        const AlertDialogTextWithPic(
-                                      text: "Something went wrong!",
-                                      svgSrc: "assets/icons/Close.svg",
+                            ShadowBloc(
+                              containerHeight: paymentType == 1
+                                  ? getProportionateScreenWidth(150)
+                                  : getProportionateScreenWidth(395),
+                              widget: SingleChildScrollView(
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      "Payment method",
+                                      style:
+                                          Theme.of(context).textTheme.headline6,
                                     ),
-                                  );
-                                }
-                                setState(() {
-                                  orderingProcess = false;
-                                });
-                              })
-                          : const Align(
-                              alignment: Alignment.center,
-                              child: CircularProgressIndicator(
-                                  color: kPrimaryColor)),
-                    ),
-                  ],
+                                    RadioListTile(
+                                      value: 1,
+                                      title: const Text("Payment upon receipt"),
+                                      groupValue: paymentType,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          paymentType = 1;
+                                        });
+                                      },
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(20)),
+                                      activeColor: kPrimaryColor,
+                                    ),
+                                    RadioListTile(
+                                      value: 2,
+                                      title: const Text("By Card"),
+                                      groupValue: paymentType,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          paymentType = 2;
+                                        });
+                                      },
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(20)),
+                                      activeColor: kPrimaryColor,
+                                    ),
+                                    if (paymentType == 2) cardIput(),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              height: getProportionateScreenWidth(10),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        height: SizeConfig.screenHeight * 0.15,
+                        padding: EdgeInsets.symmetric(
+                            horizontal: getProportionateScreenWidth(20),
+                            vertical: getProportionateScreenWidth(25)),
+                        child: !orderingProcess
+                            ? DefaultButton(
+                                text: "Make order",
+                                press: () async {
+                                  setState(() {
+                                    orderingProcess = true;
+                                  });
+                                  if (customArrivePlace) {
+                                    if (_formKeyArrivePlace.currentState!
+                                        .validate()) {
+                                      _formKeyArrivePlace.currentState!.save();
+                                    }
+                                  } else {
+                                    deliveryArrivePlace =
+                                        userInformation!.adress;
+                                  }
+                                  String paymentInf = "Payment upon receipt";
+                                  if (paymentType == 2) {
+                                    if (_formKey.currentState!.validate()) {
+                                      _formKey.currentState?.save();
+                                      paymentInf =
+                                          "Card: $cardNum Cvv: $cvv ExpDate: $expdate CardNameHolder: $cardNameHolder";
+                                    }
+                                  }
+
+                                  try {
+                                    context.read<OrdersBloc>().add(AddOrder(
+                                          cartProducts:
+                                              cartItemInf["cartItems"],
+                                          totalPrice: cartItemInf["totalPrice"],
+                                          arrivePlace: deliveryArrivePlace,
+                                          payment: paymentInf,
+                                        ));
+                                    final bloc =
+                                        context.read<OrdersBloc>().stream.first;
+                                    context.read<CartBloc>().add(ClearCart());
+                                    await bloc.then((state) {
+                                      if (state.error != null) {
+                                        throw state.error!;
+                                      } else {
+                                        showDialog(
+                                          context: context,
+                                          builder: (_) =>
+                                              const AlertDialogTextWithPic(
+                                            text: "Order is processed!",
+                                            svgSrc:
+                                                "assets/icons/Check mark rounde.svg",
+                                          ),
+                                        ).then((_) {
+                                          Navigator.of(context).pop();
+                                        });
+                                      }
+                                    });
+                                  } catch (err) {
+                                    showDialog(
+                                      context: context,
+                                      builder: (_) =>
+                                          const AlertDialogTextWithPic(
+                                        text: "Something went wrong!",
+                                        svgSrc: "assets/icons/Close.svg",
+                                      ),
+                                    );
+                                  }
+                                  setState(() {
+                                    orderingProcess = false;
+                                  });
+                                })
+                            : const Align(
+                                alignment: Alignment.center,
+                                child: CircularProgressIndicator(
+                                    color: kPrimaryColor),
+                              ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          )
+            ))
         : const LoadingScreen();
   }
 
