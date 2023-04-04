@@ -31,6 +31,7 @@ environment:
 dependencies:
   awesome_notifications: ^0.7.4+1
   cupertino_icons: ^1.0.2
+  custom_refresh_indicator: ^2.0.1
   dio: ^4.0.6
   equatable: ^2.0.5
   flutter:

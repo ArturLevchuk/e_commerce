@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:e_commerce/constants.dart';
 import 'package:e_commerce/screens/main_app/orders/orders_bloc/orders_bloc.dart';
 import 'package:e_commerce/size_config.dart';
@@ -53,10 +56,22 @@ class _OrdersScreenState extends State<OrdersScreen> {
                   }),
               titleSpacing: 0,
             ),
-            body: RefreshIndicator(
-              color: kPrimaryColor,
-              displacement: 80,
-              onRefresh: _refresh,
+            body: CustomRefreshIndicator(
+              builder: MaterialIndicatorDelegate(
+                builder: (context, controller) {
+                  final indicator = controller.value.clamp(0.0, 1.0);
+                  return Transform.rotate(
+                    angle: 2 * pi * controller.value,
+                    child: Icon(
+                      Icons.refresh,
+                      color: kPrimaryColor.withOpacity(indicator),
+                    ),
+                  );
+                },
+              ),
+              onRefresh: () async {
+                await _refresh();
+              },
               child: ordersProvItems.isEmpty
                   ? CustomScrollView(
                       slivers: [
@@ -84,6 +99,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                       ],
                     )
                   : ListView.builder(
+                      // physics: BouncingScrollPhysics(),
                       itemBuilder: (context, index) {
                         return Padding(
                           padding: EdgeInsets.symmetric(
