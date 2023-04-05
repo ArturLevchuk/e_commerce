@@ -1,3 +1,4 @@
+import 'package:e_commerce/utils/CustomScrollBehavior.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,37 +12,9 @@ import 'login_success_screen.dart';
 import 'widgets/erros_show.dart';
 import 'widgets/FormError.dart';
 
-class CompleteProfileScreen extends StatefulWidget {
+class CompleteProfileScreen extends StatelessWidget {
   const CompleteProfileScreen({super.key});
   static const routeName = "/CompleteProfileScreen";
-
-  @override
-  State<CompleteProfileScreen> createState() => _CompleteProfileScreenState();
-}
-
-class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
-  List<FocusNode> _focusNodes = [];
-  bool _hasFocus = false;
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _getFocusNodes();
-    });
-  }
-
-  void _getFocusNodes() {
-    final focusScope = FocusScope.of(context);
-    _focusNodes = focusScope.descendants.whereType<FocusNode>().toList();
-    for (var focusNode in _focusNodes) {
-      focusNode.addListener(() {
-        setState(() {
-          _hasFocus = focusNode.hasFocus;
-        });
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,38 +25,38 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         FocusScope.of(context).unfocus();
       },
       child: Scaffold(
-        appBar: newAppBar(),
-        body: SingleChildScrollView(
-          physics: _hasFocus
-              ? const BouncingScrollPhysics()
-              : const NeverScrollableScrollPhysics(),
-          child: Container(
-            width: double.infinity,
-            padding: EdgeInsets.symmetric(
-                horizontal: getProportionateScreenWidth(20)),
-            child: Column(
-              children: [
-                Text(
-                  "Complete Profile",
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontSize: getProportionateScreenWidth(28),
-                      fontWeight: FontWeight.bold),
-                ),
-                const Text(
-                  "Complete your details or continue\nwith social media",
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: SizeConfig.screenHeight * 0.04),
-                CompleteProfileForm(args: args),
-                SizedBox(height: SizeConfig.screenHeight * 0.02),
-                const Text(
-                  "By continuing your confirm that you agree with our Term and Condition",
-                  style: TextStyle(color: kTextColor),
-                  textAlign: TextAlign.center,
-                ),
-                // SizedBox(height: SizeConfig.screenHeight * 0.04),
-              ],
+        appBar: newAppBar(context),
+        body: ScrollConfiguration(
+          behavior: CustomScrollBehavior(),
+          child: SingleChildScrollView(
+            child: Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(
+                  horizontal: getProportionateScreenWidth(20)),
+              child: Column(
+                children: [
+                  Text(
+                    "Complete Profile",
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontSize: getProportionateScreenWidth(28),
+                        fontWeight: FontWeight.bold),
+                  ),
+                  const Text(
+                    "Complete your details or continue\nwith social media",
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: SizeConfig.screenHeight * 0.04),
+                  CompleteProfileForm(args: args),
+                  SizedBox(height: SizeConfig.screenHeight * 0.02),
+                  const Text(
+                    "By continuing your confirm that you agree with our Term and Condition",
+                    style: TextStyle(color: kTextColor),
+                    textAlign: TextAlign.center,
+                  ),
+                  // SizedBox(height: SizeConfig.screenHeight * 0.04),
+                ],
+              ),
             ),
           ),
         ),
@@ -91,7 +64,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     );
   }
 
-  AppBar newAppBar() {
+  AppBar newAppBar(BuildContext context) {
     return AppBar(
       centerTitle: true,
       leading: IconButton(

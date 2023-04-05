@@ -3,6 +3,7 @@ import 'package:e_commerce/repositories/auth_repository.dart';
 import 'package:e_commerce/screens/sign_in_up_screens/forgot_password.dart';
 import 'package:e_commerce/screens/sign_in_up_screens/login_success_screen.dart';
 import 'package:e_commerce/size_config.dart';
+import 'package:e_commerce/utils/CustomScrollBehavior.dart';
 import 'package:e_commerce/widgets/DefaultButton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,38 +14,32 @@ import 'widgets/FormError.dart';
 import 'widgets/NoAccountText.dart';
 import 'widgets/SocialCard.dart';
 
-class SignInScreen extends StatefulWidget {
+class SignInScreen extends StatelessWidget {
   const SignInScreen({super.key});
   static const routeName = "/SignInScreen";
 
-  @override
-  State<SignInScreen> createState() => _SignInScreenState();
-}
+  // bool _hasFocus = false;
+  // List<FocusNode> _focusNodes = [];
 
-class _SignInScreenState extends State<SignInScreen> {
-  bool _hasFocus = false;
-  List<FocusNode> _focusNodes = [];
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   WidgetsBinding.instance.addPostFrameCallback((_) {
+  //     _getFocusNodes();
+  //   });
+  // }
 
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _getFocusNodes();
-    });
-  }
-
-  void _getFocusNodes() {
-    final focusScope = FocusScope.of(context);
-    _focusNodes = focusScope.descendants.whereType<FocusNode>().toList();
-    for (var focusNode in _focusNodes) {
-      focusNode.addListener(() {
-        setState(() {
-          _hasFocus = focusNode.hasFocus;
-        });
-      });
-    }
-  }
-  
+  // void _getFocusNodes() {
+  //   final focusScope = FocusScope.of(context);
+  //   _focusNodes = focusScope.descendants.whereType<FocusNode>().toList();
+  //   for (var focusNode in _focusNodes) {
+  //     focusNode.addListener(() {
+  //       setState(() {
+  //         _hasFocus = focusNode.hasFocus;
+  //       });
+  //     });
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -54,54 +49,57 @@ class _SignInScreenState extends State<SignInScreen> {
       },
       child: Scaffold(
         appBar: newAppBar(),
-        body: SingleChildScrollView(
-          physics: _hasFocus
-              ? const BouncingScrollPhysics()
-              : const NeverScrollableScrollPhysics(),
-          child: SafeArea(
-              child: SizedBox(
-            width: double.infinity,
-            child: Padding(
-              padding: EdgeInsets.symmetric(
-                  horizontal: getProportionateScreenWidth(20)),
-              child: Column(
-                children: [
-                  Text(
-                    "Welcome Back",
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontSize: getProportionateScreenWidth(28),
-                        fontWeight: FontWeight.bold),
-                  ),
-                  const Text(
-                    "Sign in with your email and password \nor continue with social media",
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: SizeConfig.screenHeight * 0.08),
-                  const SignForm(),
-                  SizedBox(height: SizeConfig.screenHeight * 0.02),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SocialCard(
-                        icon: "assets/icons/facebook-2.svg",
-                        press: () {},
-                      ),
-                      SocialCard(
-                        icon: "assets/icons/google-icon.svg",
-                        press: () {},
-                      ),
-                      SocialCard(
-                        icon: "assets/icons/twitter.svg",
-                        press: () {},
-                      ),
-                    ],
-                  ),
-                  const NoAccountText(),
-                ],
+        body: ScrollConfiguration(
+          behavior: CustomScrollBehavior(),
+          child: SingleChildScrollView(
+            // physics: _hasFocus
+            //     ? const BouncingScrollPhysics()
+            //     : const NeverScrollableScrollPhysics(),
+            child: SafeArea(
+                child: SizedBox(
+              width: double.infinity,
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                    horizontal: getProportionateScreenWidth(20)),
+                child: Column(
+                  children: [
+                    Text(
+                      "Welcome Back",
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: getProportionateScreenWidth(28),
+                          fontWeight: FontWeight.bold),
+                    ),
+                    const Text(
+                      "Sign in with your email and password \nor continue with social media",
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: SizeConfig.screenHeight * 0.08),
+                    const SignForm(),
+                    SizedBox(height: SizeConfig.screenHeight * 0.02),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SocialCard(
+                          icon: "assets/icons/facebook-2.svg",
+                          press: () {},
+                        ),
+                        SocialCard(
+                          icon: "assets/icons/google-icon.svg",
+                          press: () {},
+                        ),
+                        SocialCard(
+                          icon: "assets/icons/twitter.svg",
+                          press: () {},
+                        ),
+                      ],
+                    ),
+                    const NoAccountText(),
+                  ],
+                ),
               ),
-            ),
-          )),
+            )),
+          ),
         ),
       ),
     );

@@ -1,3 +1,4 @@
+import 'package:e_commerce/utils/CustomScrollBehavior.dart';
 import 'package:flutter/material.dart';
 
 import '../../constants.dart';
@@ -20,54 +21,56 @@ class SignUpScreen extends StatelessWidget {
       },
       child: Scaffold(
         appBar: newAppBar(context),
-        body: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-                horizontal: getProportionateScreenWidth(20)),
-            child: Column(
-              children: [
-                Text(
-                  "Register Account",
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontSize: getProportionateScreenWidth(28),
-                      fontWeight: FontWeight.bold),
-                ),
-                const Text(
-                  "Complete your details or continue\nwith social media",
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: SizeConfig.screenHeight * 0.01),
-                const SignUpForm(),
-                SizedBox(height: SizeConfig.screenHeight * 0.05),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SocialCard(
-                      icon: "assets/icons/facebook-2.svg",
-                      press: () {},
-                    ),
-                    SocialCard(
-                      icon: "assets/icons/google-icon.svg",
-                      press: () {},
-                    ),
-                    SocialCard(
-                      icon: "assets/icons/twitter.svg",
-                      press: () {},
-                    ),
-                  ],
-                ),
-                SizedBox(height: getProportionateScreenHeight(20)),
-                Text(
-                  "By continuing you confirm that you agree\nwith our Term and Condition",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      color: kTextColor,
-                      fontSize: getProportionateScreenWidth(12)),
-                ),
-                SizedBox(height: getProportionateScreenHeight(10)),
-              ],
+        body: ScrollConfiguration(
+          behavior: CustomScrollBehavior(),
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                  horizontal: getProportionateScreenWidth(20)),
+              child: Column(
+                children: [
+                  Text(
+                    "Register Account",
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontSize: getProportionateScreenWidth(28),
+                        fontWeight: FontWeight.bold),
+                  ),
+                  const Text(
+                    "Complete your details or continue\nwith social media",
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: SizeConfig.screenHeight * 0.01),
+                  const SignUpForm(),
+                  SizedBox(height: SizeConfig.screenHeight * 0.05),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SocialCard(
+                        icon: "assets/icons/facebook-2.svg",
+                        press: () {},
+                      ),
+                      SocialCard(
+                        icon: "assets/icons/google-icon.svg",
+                        press: () {},
+                      ),
+                      SocialCard(
+                        icon: "assets/icons/twitter.svg",
+                        press: () {},
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: getProportionateScreenHeight(20)),
+                  Text(
+                    "By continuing you confirm that you agree\nwith our Term and Condition",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        color: kTextColor,
+                        fontSize: getProportionateScreenWidth(12)),
+                  ),
+                  SizedBox(height: getProportionateScreenHeight(10)),
+                ],
+              ),
             ),
           ),
         ),
