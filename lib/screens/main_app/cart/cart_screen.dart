@@ -1,11 +1,9 @@
 import 'dart:math';
-
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:e_commerce/constants.dart';
 import 'package:e_commerce/screens/main_app/cart/cart_bloc/cart_bloc.dart';
 import 'package:e_commerce/screens/sign_in_up_screens/widgets/erros_show.dart';
 import 'package:e_commerce/size_config.dart';
-import 'package:e_commerce/utils/HttpException.dart';
 import 'package:e_commerce/widgets/DefaultButton.dart';
 import 'package:e_commerce/widgets/ProductColorCircleAvatar.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +13,7 @@ import '../../../repositories/models/cart_item.dart';
 import '../../../repositories/models/product.dart';
 import '../../../routs.dart';
 import '../../../utils/CustomScrollBehavior.dart';
-import '../orders/orders_confirm_screen.dart';
+import '../orders/orders_confirm_screen/orders_confirm_screen.dart';
 import '../home/products_bloc/products_bloc.dart';
 
 part './widgets/checkOutCard.dart';
@@ -77,7 +75,6 @@ class CartScreen extends StatelessWidget {
                         );
                       },
                     ),
-                    // onRefresh: () => ,
                     onRefresh: () async {
                       await Future.delayed(
                         const Duration(milliseconds: 500),
@@ -89,7 +86,6 @@ class CartScreen extends StatelessWidget {
                     child: ScrollConfiguration(
                       behavior: CustomScrollBehavior(),
                       child: ListView.builder(
-                        // physics: const BouncingScrollPhysics(),
                         itemBuilder: (context, index) => Padding(
                           padding: const EdgeInsets.symmetric(vertical: 10),
                           child: Dismissible(
