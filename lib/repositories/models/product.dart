@@ -40,6 +40,25 @@ class Product extends Equatable {
     );
   }
 
+  factory Product.fromJson(String prodId, Map<String, dynamic> json, Map<String, dynamic>? favData) {
+    return Product(
+      id: prodId,
+      images: (json['images'] as List<dynamic>)
+          .map((str) => str.toString())
+          .toList(),
+      colors: (json['colors'] as List<dynamic>)
+          .map((color) => Color(int.parse(color)))
+          .toList(),
+      title: json['title'],
+      price: json['price'].toDouble(),
+      prev_price: json['prev_price']?.toDouble() ?? 0,
+      rating: json['rating'].toDouble(),
+      inStockCount: json['inStockCount'],
+      description: json['description'],
+      isFavorite: favData == null ? false : favData[prodId] ?? false,
+    );
+  }
+
   @override
   List<Object?> get props => [
         id,

@@ -27,24 +27,11 @@ class ProductsRepository {
 
       final List<Product> loadedProducts = [];
       extractedData.forEach((prodId, prodData) {
-        loadedProducts.add(Product(
-          id: prodId,
-          images: (prodData['images'] as List<dynamic>)
-              .map((str) => str.toString())
-              .toList(),
-          colors: (prodData['colors'] as List<dynamic>)
-              .map((color) => Color(int.parse(color)))
-              .toList(),
-          title: prodData['title'],
-          price: prodData['price'],
-          prev_price: prodData['prev_price'] ?? 0,
-          rating: prodData['rating'],
-          inStockCount: prodData['inStockCount'],
-          description: prodData['description'],
-          isFavorite: favData == null ? false : favData[prodId] ?? false,
-        ));
+        loadedProducts.add(Product.fromJson(prodId, prodData, favData));
       });
       return loadedProducts;
+    } on HttpException catch (err) {
+      rethrow;
     } catch (err) {
       throw HttpException((err as DioError).error.toString());
     }
