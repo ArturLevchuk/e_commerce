@@ -22,7 +22,7 @@ class PopularProducts extends StatelessWidget {
           text: "Popular Product",
           press: () {
             Navigator.of(context).pushReplacement(
-              customPageRouteBuilder(
+              customFadePageRouteBuilder(
                 moveTo: const AllProductsScreen(),
               ),
             );
@@ -38,8 +38,13 @@ class PopularProducts extends StatelessWidget {
                 return ProductCard(
                   productId: productsBlocState.popularItems[index].id,
                   press: () {
-                    Navigator.of(context).pushNamed(DetailsScreen.routeName,
-                        arguments: productsBlocState.items[index].id);
+                    Navigator.of(context).push(
+                      customSlidePageRouteBuilder(
+                          moveTo: const DetailsScreen(),
+                          arguments: productsBlocState.items[index].id),
+                    );
+                    // Navigator.of(context).pushNamed(DetailsScreen.routeName,
+                    //     arguments: productsBlocState.items[index].id);
                   },
                 );
               },
