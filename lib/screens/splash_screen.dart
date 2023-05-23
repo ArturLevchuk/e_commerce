@@ -17,7 +17,7 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   int currentPage = 0;
   final PageController pageController = PageController();
-  late Timer animTimer;
+  late final Timer animTimer;
   final List<Map<String, String>> splashData = [
     {
       "text": "Welcome to Ecommerce, Let’s shop!",
@@ -47,7 +47,7 @@ class _SplashScreenState extends State<SplashScreen> {
         pageController.animateToPage(
           pageController.initialPage,
           duration: defaultDuration,
-          curve: Curves.easeInOut,
+          curve: Curves.fastOutSlowIn,
         );
       }
     });
