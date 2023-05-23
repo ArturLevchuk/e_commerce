@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../repositories/models/product.dart';
 import '../../../../size_config.dart';
+import '../../../../utils/customPageRouteBuilder.dart';
 import '../../../../widgets/ProductCard.dart';
 import '../../product_details_screen/details_screen.dart';
 
@@ -38,10 +39,14 @@ class ProductsGrid extends StatelessWidget {
           leftPadding: false,
           productId: products[index].id,
           press: () {
-            Navigator.of(context).pushNamed(
-              DetailsScreen.routeName,
-              arguments: products[index].id,
+            Navigator.of(context).push(
+              customSlidePageRouteBuilder(
+                  moveTo: const DetailsScreen(), arguments: products[index].id),
             );
+            // Navigator.of(context).pushNamed(
+            //   DetailsScreen.routeName,
+            //   arguments: products[index].id,
+            // );
           },
         ),
       ),

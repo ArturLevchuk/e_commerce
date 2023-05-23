@@ -94,23 +94,23 @@ class _CustomNavigationBarState extends State<CustomNavigationBar> {
               onTap: (value) {
                 if (value == MenuState.home.index) {
                   Navigator.of(context).pushReplacement(
-                    customPageRouteBuilder(moveTo: const HomeScreen()),
+                    customFadePageRouteBuilder(moveTo: const HomeScreen()),
                   );
                 } else if (value == MenuState.profile.index) {
                   Navigator.of(context).pushReplacement(
-                    customPageRouteBuilder(moveTo: const ProfileScreen()),
+                    customFadePageRouteBuilder(moveTo: const ProfileScreen()),
                   );
                 } else if (value == MenuState.favourite.index) {
                   Navigator.of(context).pushReplacement(
-                    customPageRouteBuilder(moveTo: const FavoriteListScreen()),
+                    customFadePageRouteBuilder(moveTo: const FavoriteListScreen()),
                   );
                 } else if (value == MenuState.cart.index) {
                   Navigator.of(context).pushReplacement(
-                    customPageRouteBuilder(moveTo: const CartScreen()),
+                    customFadePageRouteBuilder(moveTo: const CartScreen()),
                   );
                 } else if (value == MenuState.catalog.index) {
                   Navigator.of(context).pushReplacement(
-                    customPageRouteBuilder(moveTo: const AllProductsScreen()),
+                    customFadePageRouteBuilder(moveTo: const AllProductsScreen()),
                   );
                 }
               },

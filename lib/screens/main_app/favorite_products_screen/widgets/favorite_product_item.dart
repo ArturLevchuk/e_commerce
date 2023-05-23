@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../repositories/models/product.dart';
 import '../../../../size_config.dart';
+import '../../../../utils/customPageRouteBuilder.dart';
 import '../../product_details_screen/details_screen.dart';
 
 class FavoriteProductItem extends StatelessWidget {
@@ -14,9 +15,13 @@ class FavoriteProductItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () async {
-        await Navigator.of(context)
-            .pushNamed(DetailsScreen.routeName, arguments: product.id);
+      onTap: () {
+        Navigator.of(context).push(
+          customSlidePageRouteBuilder(
+              moveTo: const DetailsScreen(), arguments: product.id),
+        );
+        //  Navigator.of(context)
+        //     .pushNamed(DetailsScreen.routeName, arguments: product.id);
       },
       child: Padding(
         padding: EdgeInsets.symmetric(
