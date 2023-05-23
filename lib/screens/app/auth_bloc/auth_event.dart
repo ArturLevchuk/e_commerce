@@ -8,6 +8,6 @@ abstract class AuthEvent extends Equatable {
 
 class TryAutoLogin extends AuthEvent {}
 
-class _ForseAuthenticated extends AuthEvent {}
+// class _ForseAuthenticated extends AuthEvent {}
 
-class _ForseUnauthenticated extends AuthEvent {}
+// class _ForseUnauthenticated extends AuthEvent {}

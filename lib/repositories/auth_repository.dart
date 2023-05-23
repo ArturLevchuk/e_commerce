@@ -14,8 +14,8 @@ class AuthRepositiry {
   String? _userId;
   Timer? _authTimer;
 
-  final _authStreamController = StreamController<bool>();
-  Stream<bool> authStatus() => _authStreamController.stream;
+  final _authStreamController = StreamController<bool?>();
+  Stream<bool?> authStatus() => _authStreamController.stream;
 
   Future<void> _authenticate(String email, String password, String urlSegment,
       [bool remember = true]) async {
