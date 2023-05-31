@@ -14,7 +14,7 @@ Future<void> createCartNotification(int itemsCount) async {
       channelKey: cartNotificationKey,
       title: 'You have pending purchases!!!',
       body: "There are $itemsCount items in your cart. Don't wait, order!",
-      category: NotificationCategory.Reminder,
+      category: NotificationCategory.Recommendation,
     ),
     // schedule: NotificationInterval(interval: 60),
     schedule: NotificationInterval(interval: 60, repeats: false),
@@ -22,5 +22,6 @@ Future<void> createCartNotification(int itemsCount) async {
 }
 
 Future<void> cancelNotificationsByChannelKey(String channelKey) {
-  return AwesomeNotifications().cancelNotificationsByChannelKey(cartNotificationKey);
+  return AwesomeNotifications()
+      .cancelNotificationsByChannelKey(cartNotificationKey);
 }

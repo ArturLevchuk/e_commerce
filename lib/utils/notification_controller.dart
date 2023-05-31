@@ -27,7 +27,7 @@ class NotificationController {
             channelKey: receivedNotification.channelKey!,
             title: receivedNotification.title,
             body: receivedNotification.body,
-            category: NotificationCategory.Reminder,
+            category: NotificationCategory.Recommendation,
           ),
           schedule: NotificationInterval(interval: 60 * 5, repeats: false),
         );
