@@ -190,12 +190,6 @@ class _OrdersConfirmScreenState extends State<OrdersConfirmScreen> {
                                   ),
                                   children: [
                                     ShadowBloc(
-                                      containerHeight: customArrivePlace
-                                          ? (customArrivePlaceHasError
-                                              ? getProportionateScreenWidth(242)
-                                              : getProportionateScreenWidth(
-                                                  220))
-                                          : getProportionateScreenWidth(165),
                                       widget: ScrollConfiguration(
                                         behavior: CustomScrollBehavior(),
                                         child: SingleChildScrollView(
@@ -258,9 +252,6 @@ class _OrdersConfirmScreenState extends State<OrdersConfirmScreen> {
                                       ),
                                     ),
                                     ShadowBloc(
-                                      containerHeight: paymentType == 1
-                                          ? getProportionateScreenWidth(150)
-                                          : getProportionateScreenWidth(395),
                                       widget: ScrollConfiguration(
                                         behavior: CustomScrollBehavior(),
                                         child: SingleChildScrollView(
@@ -370,13 +361,13 @@ class _OrdersConfirmScreenState extends State<OrdersConfirmScreen> {
           icon: const Icon(Icons.arrow_back_ios),
           splashRadius: getProportionateScreenWidth(25),
           onPressed: () async {
-            final bool? exit = await showExitDialog(context);
-            if (exit == null) return;
-            if (exit) {
-              Navigator.of(context).pop();
-            } else {
-              return;
-            }
+            await showExitDialog(context).then((exitConfrim) {
+              if (exitConfrim == null || !exitConfrim) {
+                return;
+              } else if (exitConfrim) {
+                Navigator.of(context).pop();
+              }
+            });
           }),
       title: Text(
         'Orders Confirm',

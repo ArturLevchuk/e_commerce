@@ -20,19 +20,17 @@ class FavoriteProductItem extends StatelessWidget {
           customSlidePageRouteBuilder(
               moveTo: const DetailsScreen(), arguments: product.id),
         );
-        //  Navigator.of(context)
-        //     .pushNamed(DetailsScreen.routeName, arguments: product.id);
       },
       child: Padding(
         padding: EdgeInsets.symmetric(
           horizontal: getProportionateScreenWidth(20),
           vertical: getProportionateScreenWidth(10),
         ),
-        child: Row(
-          children: [
-            SizedBox(
-              width: getProportionateScreenWidth(88),
-              child: AspectRatio(
+        child: SizedBox(
+          height: getProportionateScreenWidth(88),
+          child: Row(
+            children: [
+              AspectRatio(
                 aspectRatio: 1,
                 child: Container(
                   padding: const EdgeInsets.all(10),
@@ -47,21 +45,31 @@ class FavoriteProductItem extends StatelessWidget {
                   ),
                 ),
               ),
-            ),
-            SizedBox(width: getProportionateScreenWidth(20)),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  product.title,
-                  style: const TextStyle(fontSize: 16, color: Colors.black),
-                  maxLines: 2,
+              SizedBox(width: getProportionateScreenWidth(20)),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    const SizedBox(height: 5),
+                    Text(
+                      product.title,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.black,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      maxLines: 2,
+                    ),
+                    // const SizedBox(height: 10),
+                    const Spacer(),
+                    Text("\$${product.price}"),
+                    const SizedBox(height: 5),
+                  ],
                 ),
-                const SizedBox(height: 10),
-                Text("\$${product.price}"),
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );

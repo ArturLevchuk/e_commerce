@@ -40,45 +40,48 @@ class CartItemCard extends StatelessWidget {
           ),
         ),
         SizedBox(width: getProportionateScreenWidth(20)),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              product.title,
-              style: const TextStyle(fontSize: 16, color: Colors.black),
-              maxLines: 2,
-            ),
-            Row(
-              children: [
-                const Text(
-                  "Color:",
-                  style: TextStyle(fontWeight: FontWeight.w400),
-                ),
-                SizedBox(width: getProportionateScreenWidth(5)),
-                ProductColorCircleAvatar(color: color),
-              ],
-            ),
-            Text.rich(
-              TextSpan(
-                text: "\$${product.price}",
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: kPrimaryColor,
-                ),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                product.title,
+                style: const TextStyle(fontSize: 16, color: Colors.black),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              Row(
                 children: [
-                  TextSpan(
-                    text: " x$numOfItem =  ",
-                    style: const TextStyle(color: kTextColor),
+                  const Text(
+                    "Color:",
+                    style: TextStyle(fontWeight: FontWeight.w400),
                   ),
-                  TextSpan(
-                    text:
-                        "\$${getTotalCartItemPrice(product.price, numOfItem)}",
-                    style: const TextStyle(color: kPrimaryColor),
-                  ),
+                  SizedBox(width: getProportionateScreenWidth(5)),
+                  ProductColorCircleAvatar(color: color),
                 ],
               ),
-            ),
-          ],
+              Text.rich(
+                TextSpan(
+                  text: "\$${product.price}",
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: kPrimaryColor,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: " x$numOfItem =  ",
+                      style: const TextStyle(color: kTextColor),
+                    ),
+                    TextSpan(
+                      text:
+                          "\$${getTotalCartItemPrice(product.price, numOfItem)}",
+                      style: const TextStyle(color: kPrimaryColor),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     );

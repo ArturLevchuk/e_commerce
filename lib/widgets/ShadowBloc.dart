@@ -21,8 +21,6 @@ class ShadowBloc extends StatelessWidget {
         top: getProportionateScreenWidth(20),
       ),
       padding: EdgeInsets.all(getProportionateScreenWidth(defPadding)),
-      height: containerHeight,
-      width: double.infinity,
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: const [

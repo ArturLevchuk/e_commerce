@@ -14,7 +14,7 @@ class ProductCard extends StatelessWidget {
     Key? key,
     required this.productId,
     this.width = 140,
-    this.aspectRatio = 1.02,
+    this.aspectRatio = 1.1,
     required this.press,
     this.leftPadding = true,
   }) : super(key: key);
@@ -44,7 +44,7 @@ class ProductCard extends StatelessWidget {
                 AspectRatio(
                   aspectRatio: aspectRatio,
                   child: Container(
-                    padding: EdgeInsets.all(getProportionateScreenWidth(20)),
+                    padding: EdgeInsets.all(getProportionateScreenWidth(15)),
                     decoration: BoxDecoration(
                       color: kSecondaryColor.withOpacity(.1),
                       borderRadius: BorderRadius.circular(15),

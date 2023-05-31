@@ -153,6 +153,7 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
               bottomNavigationBar:
                   CustomNavigationBar(currentIndex: MenuState.catalog.index),
               endDrawer: showDrawer(drawerScreen),
+              
             );
           },
         ),

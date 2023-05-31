@@ -17,18 +17,74 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
-  bool _isLoading = false;
-  late final AnimationController _controller = AnimationController(
-    duration: const Duration(seconds: 1),
-    vsync: this,
-  );
-  late final Animation<Offset> _offsetAnimation = Tween<Offset>(
-    begin: Offset.zero,
-    end: const Offset(-1.0, 0.0),
-  ).animate(CurvedAnimation(
-    parent: _controller,
-    curve: Curves.linear,
-  ));
+  late final AnimationController _controller;
+  late final Animation<Offset> _offsetAnimation;
+
+  Future<void> notificationsPermissonsCheck() async {
+    return AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
+      if (!isAllowed) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text("Allow Notifications"),
+            content: const Text('Our app would like to send you notifications'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text(
+                  'Remind me later',
+                  style: TextStyle(
+                    color: kTextColor,
+                    fontSize: 18,
+                  ),
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text(
+                  'Don\'t Allow',
+                  style: TextStyle(
+                    color: kTextColor,
+                    fontSize: 18,
+                  ),
+                ),
+              ),
+              TextButton(
+                onPressed: () => AwesomeNotifications()
+                    .requestPermissionToSendNotifications()
+                    .then((_) => Navigator.pop(context)),
+                child: const Text(
+                  'Allow',
+                  style: TextStyle(
+                    color: kPrimaryColor,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    _controller = AnimationController(
+      duration: const Duration(seconds: 1),
+      vsync: this,
+    );
+    _offsetAnimation = Tween<Offset>(
+      begin: Offset.zero,
+      end: const Offset(-1.0, 0.0),
+    ).animate(_controller);
+    super.initState();
+  }
 
   @override
   Future<void> didChangeDependencies() async {
@@ -39,59 +95,6 @@ class _HomeScreenState extends State<HomeScreen>
     if (context.read<ProductsBloc>().state.productsLoadStatus ==
         ProductsLoadStatus.loaded) {
       _controller.value = 1;
-    }
-    if (_controller.value == 1) {
-      AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
-        if (!isAllowed) {
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: const Text("Allow Notifications"),
-              content:
-                  const Text('Our app would like to send you notifications'),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Text(
-                    'Remind me later',
-                    style: TextStyle(
-                      color: kTextColor,
-                      fontSize: 18,
-                    ),
-                  ),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Text(
-                    'Don\'t Allow',
-                    style: TextStyle(
-                      color: kTextColor,
-                      fontSize: 18,
-                    ),
-                  ),
-                ),
-                TextButton(
-                  onPressed: () => AwesomeNotifications()
-                      .requestPermissionToSendNotifications()
-                      .then((_) => Navigator.pop(context)),
-                  child: const Text(
-                    'Allow',
-                    style: TextStyle(
-                      color: kPrimaryColor,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
-        }
-      });
     }
     super.didChangeDependencies();
   }
@@ -107,47 +110,44 @@ class _HomeScreenState extends State<HomeScreen>
     return BlocConsumer<ProductsBloc, ProductsState>(
       listenWhen: (previous, current) =>
           previous.productsLoadStatus != current.productsLoadStatus,
-      listener: (context, state) {
+      listener: (context, state) async {
         if (state.productsLoadStatus == ProductsLoadStatus.loaded &&
-            _isLoading == false) {
-          _controller.value = 1;
-        } else if (state.productsLoadStatus == ProductsLoadStatus.loaded &&
-            _isLoading == true) {
+            _controller.status != AnimationStatus.completed) {
           _controller.forward();
-        }
-        if (state.productsLoadStatus == ProductsLoadStatus.loading) {
-          setState(() {
-            _isLoading = true;
-          });
         }
       },
       builder: (context, state) {
         return Stack(
           children: [
             if (state.productsLoadStatus == ProductsLoadStatus.loaded)
-              Scaffold(
-                extendBody: true,
-                body: SafeArea(
-                  bottom: false,
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        SizedBox(height: getProportionateScreenHeight(25)),
-                        const DiscountBanner(),
-                        SizedBox(height: getProportionateScreenHeight(25)),
-                        const Categories(),
-                        SizedBox(height: getProportionateScreenHeight(15)),
-                        const SpecialOffers(),
-                        SizedBox(height: getProportionateScreenHeight(15)),
-                        const PopularProducts(),
-                        const SizedBox(
-                            height: kBottomNavigationBarHeight * 1.2),
-                      ],
+              FutureBuilder(
+                future: Future.delayed(const Duration(seconds: 2), () async {
+                  await notificationsPermissonsCheck();
+                }),
+                builder: (context, snapshot) => Scaffold(
+                  extendBody: true,
+                  body: SafeArea(
+                    bottom: false,
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          SizedBox(height: getProportionateScreenHeight(25)),
+                          const DiscountBanner(),
+                          SizedBox(height: getProportionateScreenHeight(25)),
+                          const Categories(),
+                          SizedBox(height: getProportionateScreenHeight(15)),
+                          const SpecialOffers(),
+                          SizedBox(height: getProportionateScreenHeight(15)),
+                          const PopularProducts(),
+                          const SizedBox(
+                              height: kBottomNavigationBarHeight * 1.2),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                bottomNavigationBar: CustomNavigationBar(
-                  currentIndex: MenuState.home.index,
+                  bottomNavigationBar: CustomNavigationBar(
+                    currentIndex: MenuState.home.index,
+                  ),
                 ),
               ),
             if (state.productsLoadStatus == ProductsLoadStatus.error)
@@ -162,10 +162,11 @@ class _HomeScreenState extends State<HomeScreen>
                   ),
                 ),
               ),
-            if (!_offsetAnimation.isCompleted)
+            if (!_controller.isCompleted)
               SlideTransition(
-                  position: _offsetAnimation,
-                  child: const LoadingHomeScreenSplash()),
+                position: _offsetAnimation,
+                child: const LoadingHomeScreenSplash(),
+              ),
           ],
         );
       },

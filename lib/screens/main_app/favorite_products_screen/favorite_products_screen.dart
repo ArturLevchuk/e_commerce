@@ -1,3 +1,4 @@
+import 'package:e_commerce/utils/CustomScrollBehavior.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -37,10 +38,13 @@ class FavoriteListScreen extends StatelessWidget {
         child: BlocBuilder<ProductsBloc, ProductsState>(
           builder: (context, state) {
             final favProductList = state.favItems;
-            return ListView.builder(
-              itemBuilder: (context, index) =>
-                  FavoriteProductItem(product: favProductList[index]),
-              itemCount: favProductList.length,
+            return ScrollConfiguration(
+              behavior: CustomScrollBehavior(),
+              child: ListView.builder(
+                itemBuilder: (context, index) =>
+                    FavoriteProductItem(product: favProductList[index]),
+                itemCount: favProductList.length,
+              ),
             );
           },
         ),

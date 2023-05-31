@@ -46,7 +46,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
         items: state.items,
       );
       await createCartNotification(state.items.length);
-      emit(state.copyWith(items: newItems));
+      emit(state.copyWith(items: newItems, error: null));
     } catch (err) {
       emit(state.copyWith(error: err.toString()));
     }
@@ -63,7 +63,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       );
       await cancelNotificationsByChannelKey(cartNotificationKey);
       await createCartNotification(newItems.length);
-      emit(state.copyWith(items: newItems));
+      emit(state.copyWith(items: newItems, error: null));
     } catch (err) {
       emit(state.copyWith(error: err.toString()));
     }
@@ -75,7 +75,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
   ) async {
     try {
       await cartRepository.clearCart();
-      emit(state.copyWith(items: {}));
+      emit(state.copyWith(items: {}, error: null));
     } catch (err) {
       emit(state.copyWith(error: err.toString()));
     }
