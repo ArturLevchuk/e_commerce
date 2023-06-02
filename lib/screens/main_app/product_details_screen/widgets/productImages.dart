@@ -1,3 +1,4 @@
+import 'package:e_commerce/utils/CustomScrollBehavior.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../constants.dart';
@@ -17,38 +18,56 @@ class ProductImages extends StatefulWidget {
 }
 
 class _ProductImagesState extends State<ProductImages> {
-  int selectedImage = 0;
+  int _selectedImage = 0;
+  final PageController _pageController = PageController();
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        SizedBox(
-          width: getProportionateScreenWidth(238),
-          child: AspectRatio(
-            aspectRatio: 1,
-            child: FadeInImage.assetNetwork(
-              alignment: Alignment.center,
-              placeholder: "assets/images/box.png",
-              image: widget.product.images[selectedImage],
+    return SizedBox(
+      height: SizeConfig.getBodyHeight() * .45,
+      child: LayoutBuilder(builder: (context, constraints) {
+        return Column(
+          children: [
+            SizedBox(
+              height: constraints.maxHeight * .70,
+              child: PageView.builder(
+                scrollBehavior: CustomScrollBehavior(),
+                scrollDirection: Axis.horizontal,
+                controller: _pageController,
+                itemBuilder: (context, index) => FadeInImage.assetNetwork(
+                  filterQuality: FilterQuality.high,
+                  alignment: Alignment.center,
+                  placeholder: "assets/images/box.png",
+                  image: widget.product.images[index],
+                ),
+                itemCount: widget.product.images.length,
+                onPageChanged: (value) {
+                  setState(() {
+                    _selectedImage = value;
+                  });
+                },
+              ),
             ),
-          ),
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(widget.product.images.length,
-              (index) => buildSmallPreview(index)),
-        ),
-      ],
+            const Spacer(),
+            SizedBox(
+              height: constraints.maxHeight * .20,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(widget.product.images.length,
+                    (index) => buildSmallPreview(index)),
+              ),
+            ),
+          ],
+        );
+      }),
     );
   }
 
   Widget buildSmallPreview(int index) {
     return GestureDetector(
       onTap: () {
-        setState(() {
-          selectedImage = index;
-        });
+        _pageController.animateToPage(index,
+            duration: kAnimationDuration, curve: Curves.fastOutSlowIn);
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
@@ -59,7 +78,7 @@ class _ProductImagesState extends State<ProductImages> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(10),
           border:
-              selectedImage == index ? Border.all(color: kPrimaryColor) : null,
+              _selectedImage == index ? Border.all(color: kPrimaryColor) : null,
         ),
         padding: EdgeInsets.all(getProportionateScreenWidth(8)),
         child: FadeInImage.assetNetwork(
