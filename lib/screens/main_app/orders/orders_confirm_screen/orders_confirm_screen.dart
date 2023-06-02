@@ -18,6 +18,10 @@ import '../../cart/cart_bloc/cart_bloc.dart';
 import 'widgets/CustomArrivePlaceTextField.dart';
 import 'widgets/card_input_fields.dart';
 
+enum PaymentType { card, cash }
+
+enum DeliveryPlaceType { defaultPlace, customPlace }
+
 class OrdersConfirmScreen extends StatefulWidget {
   const OrdersConfirmScreen({super.key});
   static const routeName = '/OrdersConfirmScreen';
@@ -29,19 +33,20 @@ class OrdersConfirmScreen extends StatefulWidget {
 class _OrdersConfirmScreenState extends State<OrdersConfirmScreen> {
   late final Map<String, dynamic> cartItemInf =
       ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+  final _formKeyDeliveryPlace = GlobalKey<FormState>();
+  final _formKeyCard = GlobalKey<FormState>();
+
+  PaymentType _paymentType = PaymentType.cash;
+  DeliveryPlaceType _deliveryPlaceType = DeliveryPlaceType.defaultPlace;
+
   String deliveryArrivePlace = '';
-  bool customArrivePlace = false;
-  bool customArrivePlaceHasError = false;
-  int paymentType = 1;
-  final _formKeyArrivePlace = GlobalKey<FormState>();
-  final _formKey = GlobalKey<FormState>();
+  // bool customArrivePlace = false;
+  // bool customArrivePlaceHasError = false;
+
   CardInformation? cardInformation;
   UserInformation? userInformation;
   bool orderingProcess = false;
   bool isLoading = false;
-
-  bool _hasFocus = false;
-  List<FocusNode> _focusNodes = [];
 
   @override
   void didChangeDependencies() async {
@@ -69,25 +74,17 @@ class _OrdersConfirmScreenState extends State<OrdersConfirmScreen> {
 
   Future<void> tryToMakeOrder() async {
     bool error = false;
-    if (customArrivePlace) {
-      if (_formKeyArrivePlace.currentState!.validate()) {
-        _formKeyArrivePlace.currentState!.save();
-        setState(() {
-          customArrivePlaceHasError = false;
-        });
+    if (_deliveryPlaceType == DeliveryPlaceType.customPlace) {
+      if (_formKeyDeliveryPlace.currentState!.validate()) {
+        _formKeyDeliveryPlace.currentState!.save();
       } else {
-        setState(() {
-          customArrivePlaceHasError = true;
-        });
         error = true;
       }
-    } else {
-      deliveryArrivePlace = userInformation!.adress;
     }
     String paymentInf = "Payment upon receipt";
-    if (paymentType == 2) {
-      if (_formKey.currentState!.validate()) {
-        _formKey.currentState?.save();
+    if (_paymentType == PaymentType.card) {
+      if (_formKeyCard.currentState!.validate()) {
+        _formKeyCard.currentState?.save();
         paymentInf =
             "Card: ${cardInformation?.cardNumber} Cvv: ${cardInformation?.cvvCode} ExpDate: ${cardInformation?.expdate} CardNameHolder: ${cardInformation?.cardNameHolder}";
       } else {
@@ -95,6 +92,33 @@ class _OrdersConfirmScreenState extends State<OrdersConfirmScreen> {
       }
     }
     if (error) return;
+
+    // if (customArrivePlace) {
+    //   if (_formKeyDeliveryPlace.currentState!.validate()) {
+    //     _formKeyDeliveryPlace.currentState!.save();
+    //     setState(() {
+    //       customArrivePlaceHasError = false;
+    //     });
+    //   } else {
+    //     setState(() {
+    //       customArrivePlaceHasError = true;
+    //     });
+    //     error = true;
+    //   }
+    // } else {
+    //   deliveryArrivePlace = userInformation!.adress;
+    // }
+    // String paymentInf = "Payment upon receipt";
+    // if (paymentType == 2) {
+    //   if (_formKeyCard.currentState!.validate()) {
+    //     _formKeyCard.currentState?.save();
+    //     paymentInf =
+    //         "Card: ${cardInformation?.cardNumber} Cvv: ${cardInformation?.cvvCode} ExpDate: ${cardInformation?.expdate} CardNameHolder: ${cardInformation?.cardNameHolder}";
+    //   } else {
+    //     error = true;
+    //   }
+    // }
+    // if (error) return;
 
     setState(() {
       orderingProcess = true;
@@ -137,222 +161,164 @@ class _OrdersConfirmScreenState extends State<OrdersConfirmScreen> {
     });
   }
 
-  void _getFocusNodes() {
-    final focusScope = FocusScope.of(context);
-    _focusNodes = focusScope.descendants.whereType<FocusNode>().toList();
-    for (var focusNode in _focusNodes) {
-      focusNode.addListener(() {
-        setState(() {
-          _hasFocus = focusNode.hasFocus;
-        });
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return !isLoading
-        ? FutureBuilder(
-            future: Future.delayed(Duration.zero, () {
-              _getFocusNodes();
-            }),
-            builder: (context, snapshot) {
-              return GestureDetector(
-                onTap: () {
-                  FocusScope.of(context).unfocus();
-                },
-                child: WillPopScope(
-                  onWillPop: () async {
-                    return await showExitDialog(context).then((value) {
-                      if (value == null) {
-                        return false;
-                      } else {
-                        return value;
-                      }
-                    });
-                  },
-                  child: Scaffold(
-                      appBar: customAppBar(context),
-                      body: ScrollConfiguration(
-                        behavior: CustomScrollBehavior(),
-                        child: SingleChildScrollView(
-                          physics: _hasFocus
-                              ? const AlwaysScrollableScrollPhysics()
-                              : const NeverScrollableScrollPhysics(),
-                          child: Column(
-                            children: [
-                              SizedBox(
-                                height: SizeConfig.screenHeight * 0.75,
-                                child: ListView(
-                                  // physics: const BouncingScrollPhysics(),
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: getProportionateScreenWidth(20),
-                                  ),
-                                  children: [
-                                    ShadowBloc(
-                                      widget: ScrollConfiguration(
-                                        behavior: CustomScrollBehavior(),
-                                        child: SingleChildScrollView(
-                                          child: Column(
-                                            children: [
-                                              Text(
-                                                "Delivery Adress",
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .headline6,
-                                              ),
-                                              RadioListTile(
-                                                value: false,
-                                                title: const Text(
-                                                    "Standart Place"),
-                                                subtitle: Text(
-                                                    userInformation!.adress),
-                                                groupValue: customArrivePlace,
-                                                onChanged: (value) {
-                                                  setState(() {
-                                                    customArrivePlace = value!;
-                                                  });
-                                                },
-                                                shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            20)),
-                                                activeColor: kPrimaryColor,
-                                              ),
-                                              RadioListTile(
-                                                value: true,
-                                                title: const Text("Custom"),
-                                                groupValue: customArrivePlace,
-                                                onChanged: (value) {
-                                                  setState(() {
-                                                    customArrivePlace = value!;
-                                                    customArrivePlaceHasError =
-                                                        false;
-                                                  });
-                                                },
-                                                shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            20)),
-                                                activeColor: kPrimaryColor,
-                                              ),
-                                              if (customArrivePlace)
-                                                CustomArrivePlaceTextField(
-                                                  formKeyArrivePlace:
-                                                      _formKeyArrivePlace,
-                                                  deliveryArrivePlaceUpdate:
-                                                      (newValue) {
-                                                    deliveryArrivePlace =
-                                                        newValue!;
-                                                  },
-                                                ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    ShadowBloc(
-                                      widget: ScrollConfiguration(
-                                        behavior: CustomScrollBehavior(),
-                                        child: SingleChildScrollView(
-                                          child: Column(
-                                            children: [
-                                              Text(
-                                                "Payment method",
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .headline6,
-                                              ),
-                                              RadioListTile(
-                                                value: 1,
-                                                title: const Text(
-                                                    "Payment upon receipt"),
-                                                groupValue: paymentType,
-                                                onChanged: (value) {
-                                                  setState(() {
-                                                    paymentType = 1;
-                                                  });
-                                                },
-                                                shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            20)),
-                                                activeColor: kPrimaryColor,
-                                              ),
-                                              RadioListTile(
-                                                value: 2,
-                                                title: const Text("By Card"),
-                                                groupValue: paymentType,
-                                                onChanged: (value) {
-                                                  setState(() {
-                                                    paymentType = 2;
-                                                  });
-                                                },
-                                                shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            20)),
-                                                activeColor: kPrimaryColor,
-                                              ),
-                                              if (paymentType == 2)
-                                                CardInputFields(
-                                                  formKey: _formKey,
-                                                  updateCardNum: (newValue) {
-                                                    cardInformation
-                                                        ?.cardNumber = newValue;
-                                                  },
-                                                  updateCardNameHolder:
-                                                      (newValue) {
-                                                    cardInformation
-                                                            ?.cardNameHolder =
-                                                        newValue;
-                                                  },
-                                                  updateExpdate: (newValue) {
-                                                    cardInformation?.expdate =
-                                                        newValue;
-                                                  },
-                                                  updateCVV: (newValue) {
-                                                    cardInformation?.cvvCode =
-                                                        newValue;
-                                                  },
-                                                ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      height: getProportionateScreenWidth(10),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Container(
-                                height: SizeConfig.screenHeight * 0.15,
-                                // color: Colors.pink,
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: getProportionateScreenWidth(20),
-                                    vertical: getProportionateScreenWidth(26)),
-                                child: !orderingProcess
-                                    ? DefaultButton(
-                                        text: "Make order",
-                                        press: () async {
-                                          await tryToMakeOrder();
-                                        })
-                                    : const Align(
-                                        alignment: Alignment.center,
-                                        child: CircularProgressIndicator(
-                                            color: kPrimaryColor),
-                                      ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      )),
+        ? GestureDetector(
+            onTap: () {
+              FocusScope.of(context).unfocus();
+            },
+            child: WillPopScope(
+              onWillPop: () async {
+                return await showExitDialog(context).then((value) {
+                  if (value == null) {
+                    return false;
+                  } else {
+                    return value;
+                  }
+                });
+              },
+              child: Scaffold(
+                appBar: customAppBar(context),
+                body: ScrollConfiguration(
+                  behavior: CustomScrollBehavior(),
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: getProportionateScreenWidth(20)),
+                      child: Column(
+                        children: [
+                          deliveryAdressCard(context),
+                          paymentMethodCard(context),
+                          SizedBox(
+                            height: getProportionateScreenWidth(20),
+                          )
+                          // const Spacer(),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
-              );
-            })
+                bottomNavigationBar: Padding(
+                  padding: EdgeInsets.all(getProportionateScreenWidth(20)),
+                  child: !orderingProcess
+                      ? DefaultButton(
+                          text: "Make order",
+                          press: () async {
+                            await tryToMakeOrder();
+                          })
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                              CircularProgressIndicator(color: kPrimaryColor)
+                            ]),
+                ),
+              ),
+            ),
+          )
         : const LoadingScreen();
+  }
+
+  ShadowBloc paymentMethodCard(BuildContext context) {
+    return ShadowBloc(
+      widget: Column(
+        children: [
+          Text(
+            "Payment method",
+            style: Theme.of(context).textTheme.headline6,
+          ),
+          RadioListTile(
+            value: PaymentType.cash,
+            title: const Text("Payment upon receipt"),
+            groupValue: _paymentType,
+            onChanged: (value) {
+              setState(() {
+                _paymentType = value as PaymentType;
+              });
+            },
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            activeColor: kPrimaryColor,
+          ),
+          RadioListTile(
+            value: PaymentType.card,
+            title: const Text("By Card"),
+            groupValue: _paymentType,
+            onChanged: (value) {
+              setState(() {
+                _paymentType = value as PaymentType;
+              });
+            },
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            activeColor: kPrimaryColor,
+          ),
+          if (_paymentType == PaymentType.card)
+            CardInputFields(
+              formKey: _formKeyCard,
+              updateCardNum: (newValue) {
+                cardInformation?.cardNumber = newValue;
+              },
+              updateCardNameHolder: (newValue) {
+                cardInformation?.cardNameHolder = newValue;
+              },
+              updateExpdate: (newValue) {
+                cardInformation?.expdate = newValue;
+              },
+              updateCVV: (newValue) {
+                cardInformation?.cvvCode = newValue;
+              },
+            ),
+        ],
+      ),
+    );
+  }
+
+  ShadowBloc deliveryAdressCard(BuildContext context) {
+    return ShadowBloc(
+      widget: Column(
+        children: [
+          Text(
+            "Delivery Adress",
+            style: Theme.of(context).textTheme.headline6,
+          ),
+          RadioListTile(
+            value: DeliveryPlaceType.defaultPlace,
+            title: const Text("Standart Place"),
+            subtitle: Text(userInformation!.adress),
+            groupValue: _deliveryPlaceType,
+            onChanged: (value) {
+              setState(() {
+                _deliveryPlaceType = value as DeliveryPlaceType;
+              });
+            },
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            activeColor: kPrimaryColor,
+          ),
+          RadioListTile(
+            value: DeliveryPlaceType.customPlace,
+            title: const Text("Custom"),
+            groupValue: _deliveryPlaceType,
+            onChanged: (value) {
+              setState(() {
+                _deliveryPlaceType = value as DeliveryPlaceType;
+              });
+            },
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            activeColor: kPrimaryColor,
+          ),
+          if (_deliveryPlaceType == DeliveryPlaceType.customPlace)
+            CustomArrivePlaceTextField(
+              formKeyArrivePlace: _formKeyDeliveryPlace,
+              deliveryArrivePlaceUpdate: (newValue) {
+                deliveryArrivePlace = newValue!;
+              },
+            ),
+        ],
+      ),
+    );
   }
 
   AppBar customAppBar(BuildContext context) {

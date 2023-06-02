@@ -39,6 +39,7 @@ class _CustomArrivePlaceTextFieldState
             enabledBorder: UnderlineInputBorder(),
             focusedBorder: UnderlineInputBorder(),
             errorBorder: UnderlineInputBorder(),
+            border: UnderlineInputBorder(),
             hintText: "Where do you want delivery?",
           ),
           validator: (value) {
