@@ -27,49 +27,60 @@ class SignUpScreen extends StatelessWidget {
             child: Padding(
               padding: EdgeInsets.symmetric(
                   horizontal: getProportionateScreenWidth(20)),
-              child: Column(
-                children: [
-                  Text(
-                    "Register Account",
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontSize: getProportionateScreenWidth(28),
-                        fontWeight: FontWeight.bold),
-                  ),
-                  const Text(
-                    "Complete your details or continue\nwith social media",
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: SizeConfig.screenHeight * 0.01),
-                  const SignUpForm(),
-                  SizedBox(height: SizeConfig.screenHeight * 0.05),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+              child: SizedBox(
+                height: SizeConfig.getBodyHeight(),
+                child: LayoutBuilder(builder: (context, constraints) {
+                  final bodyHeight = constraints.maxHeight;
+                  return Column(
                     children: [
-                      SocialCard(
-                        icon: "assets/icons/facebook-2.svg",
-                        press: () {},
+                      Text(
+                        "Register Account",
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: getProportionateScreenWidth(28),
+                            fontWeight: FontWeight.bold),
                       ),
-                      SocialCard(
-                        icon: "assets/icons/google-icon.svg",
-                        press: () {},
+                      const Text(
+                        "Complete your details or continue\nwith social media",
+                        textAlign: TextAlign.center,
                       ),
-                      SocialCard(
-                        icon: "assets/icons/twitter.svg",
-                        press: () {},
+                      SizedBox(height: bodyHeight * 0.01),
+                      SizedBox(
+                        height: bodyHeight * .65,
+                        child: const SignUpForm(),
                       ),
+                      // SizedBox(height: bodyHeight * 0.05),
+                      const Spacer(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SocialCard(
+                            icon: "assets/icons/facebook-2.svg",
+                            press: () {},
+                          ),
+                          SocialCard(
+                            icon: "assets/icons/google-icon.svg",
+                            press: () {},
+                          ),
+                          SocialCard(
+                            icon: "assets/icons/twitter.svg",
+                            press: () {},
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: getProportionateScreenHeight(20)),
+                      Text(
+                        "By continuing you confirm that you agree\nwith our Term and Condition",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            color: kTextColor,
+                            fontSize: getProportionateScreenWidth(12)),
+                      ),
+                      // SizedBox(height: getProportionateScreenHeight(10)),
+                      const Spacer(),
                     ],
-                  ),
-                  SizedBox(height: getProportionateScreenHeight(20)),
-                  Text(
-                    "By continuing you confirm that you agree\nwith our Term and Condition",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        color: kTextColor,
-                        fontSize: getProportionateScreenWidth(12)),
-                  ),
-                  SizedBox(height: getProportionateScreenHeight(10)),
-                ],
+                  );
+                }),
               ),
             ),
           ),
@@ -136,7 +147,8 @@ class _SignUpFormState extends State<SignUpForm> {
           buildConfirmPasswordFormField(),
           SizedBox(height: getProportionateScreenHeight(30)),
           FormError(errors: errors),
-          SizedBox(height: getProportionateScreenHeight(30)),
+          // SizedBox(height: getProportionateScreenHeight(30)),
+          const Spacer(),
           DefaultButton(
             text: "Continue",
             press: () async {
@@ -176,7 +188,8 @@ class _SignUpFormState extends State<SignUpForm> {
       },
       validator: (value) {
         if (signUpInf['password'] != confirmPassword &&
-            !errors.contains(kMatchPassError)) {
+            !errors.contains(kMatchPassError) &&
+            !errors.contains(kShortPassError)) {
           setState(() {
             errors.add(kMatchPassError);
           });
@@ -232,7 +245,8 @@ class _SignUpFormState extends State<SignUpForm> {
             errors.add(kEmailNullError);
           });
         } else if (!emailValidatorRegExp.hasMatch(value) &&
-            !errors.contains(kInvalidEmailError)) {
+            !errors.contains(kInvalidEmailError) &&
+            !errors.contains(kEmailNullError)) {
           setState(() {
             errors.add(kInvalidEmailError);
           });
@@ -266,7 +280,9 @@ class _SignUpFormState extends State<SignUpForm> {
           setState(() {
             errors.add(kPassNullError);
           });
-        } else if (value.length < 8 && !errors.contains(kShortPassError)) {
+        } else if (value.length < 8 &&
+            !errors.contains(kShortPassError) &&
+            !errors.contains(kPassNullError)) {
           setState(() {
             errors.add(kShortPassError);
           });

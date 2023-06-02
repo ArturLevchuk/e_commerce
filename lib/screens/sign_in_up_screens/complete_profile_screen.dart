@@ -30,33 +30,38 @@ class CompleteProfileScreen extends StatelessWidget {
           behavior: CustomScrollBehavior(),
           child: SingleChildScrollView(
             child: Container(
-              width: double.infinity,
+              height: SizeConfig.getBodyHeight(),
               padding: EdgeInsets.symmetric(
                   horizontal: getProportionateScreenWidth(20)),
-              child: Column(
-                children: [
-                  Text(
-                    "Complete Profile",
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontSize: getProportionateScreenWidth(28),
-                        fontWeight: FontWeight.bold),
-                  ),
-                  const Text(
-                    "Complete your details or continue\nwith social media",
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: SizeConfig.screenHeight * 0.04),
-                  CompleteProfileForm(args: args),
-                  SizedBox(height: SizeConfig.screenHeight * 0.02),
-                  const Text(
-                    "By continuing your confirm that you agree with our Term and Condition",
-                    style: TextStyle(color: kTextColor),
-                    textAlign: TextAlign.center,
-                  ),
-                  // SizedBox(height: SizeConfig.screenHeight * 0.04),
-                ],
-              ),
+              child: LayoutBuilder(builder: (context, constraints) {
+                final bodyHeight = constraints.maxHeight;
+                return Column(
+                  children: [
+                    Text(
+                      "Complete Profile",
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: getProportionateScreenWidth(28),
+                          fontWeight: FontWeight.bold),
+                    ),
+                    const Text(
+                      "Complete your details or continue\nwith social media",
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: bodyHeight * 0.04),
+                    SizedBox(
+                        height: bodyHeight * .7,
+                        child: CompleteProfileForm(args: args)),
+                    const Spacer(),
+                    const Text(
+                      "By continuing your confirm that you agree with our Term and Condition",
+                      style: TextStyle(color: kTextColor),
+                      textAlign: TextAlign.center,
+                    ),
+                    const Spacer(),
+                  ],
+                );
+              }),
             ),
           ),
         ),
@@ -112,64 +117,61 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
   Widget build(BuildContext context) {
     return Form(
       key: _formKey,
-      child: SizedBox(
-        height: SizeConfig.screenHeight * 0.63,
-        child: Column(
-          children: [
-            buildNameField(),
-            SizedBox(height: getProportionateScreenHeight(30)),
-            buildPhoneNumberField(),
-            SizedBox(height: getProportionateScreenHeight(30)),
-            buildAdressField(),
-            SizedBox(height: getProportionateScreenHeight(20)),
-            FormError(errors: errors),
-            const Spacer(),
-            isLoading
-                ? const CircularProgressIndicator(color: kPrimaryColor)
-                : DefaultButton(
-                    text: "Continue",
-                    press: () async {
-                      setState(() {
-                        isLoading = true;
-                      });
-                      if (_formKey.currentState!.validate()) {
-                        if (errors.isEmpty) {
-                          _formKey.currentState?.save();
-                          try {
-                            await RepositoryProvider.of<AuthRepositiry>(context,
-                                    listen: false)
-                                .signup({
-                              'email': widget.args['email'] as String,
-                              'password': widget.args['password'] as String,
-                              'name': name,
-                              'phoneNumber': phoneNumber,
-                              'adress': adress,
+      child: Column(
+        children: [
+          buildNameField(),
+          SizedBox(height: getProportionateScreenHeight(30)),
+          buildPhoneNumberField(),
+          SizedBox(height: getProportionateScreenHeight(30)),
+          buildAdressField(),
+          SizedBox(height: getProportionateScreenHeight(20)),
+          FormError(errors: errors),
+          const Spacer(),
+          isLoading
+              ? const CircularProgressIndicator(color: kPrimaryColor)
+              : DefaultButton(
+                  text: "Continue",
+                  press: () async {
+                    setState(() {
+                      isLoading = true;
+                    });
+                    if (_formKey.currentState!.validate()) {
+                      if (errors.isEmpty) {
+                        _formKey.currentState?.save();
+                        try {
+                          await RepositoryProvider.of<AuthRepositiry>(context,
+                                  listen: false)
+                              .signup({
+                            'email': widget.args['email'] as String,
+                            'password': widget.args['password'] as String,
+                            'name': name,
+                            'phoneNumber': phoneNumber,
+                            'adress': adress,
+                          });
+                        } on HttpException catch (err) {
+                          showErrorDialog(context, err.toString());
+                        } catch (err) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(err.toString())));
+                        } finally {
+                          if (RepositoryProvider.of<AuthRepositiry>(context,
+                                  listen: false)
+                              .isAuth) {
+                            setState(() {
+                              isLoading = false;
                             });
-                          } on HttpException catch (err) {
-                            showErrorDialog(context, err.toString());
-                          } catch (err) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(err.toString())));
-                          } finally {
-                            if (RepositoryProvider.of<AuthRepositiry>(context,
-                                    listen: false)
-                                .isAuth) {
-                              setState(() {
-                                isLoading = false;
-                              });
-                              Navigator.of(context).pushReplacementNamed(
-                                  LoginSuccessScreen.routeName);
-                            }
+                            Navigator.of(context).pushReplacementNamed(
+                                LoginSuccessScreen.routeName);
                           }
                         }
                       }
-                      setState(() {
-                        isLoading = false;
-                      });
-                    },
-                  ),
-          ],
-        ),
+                    }
+                    setState(() {
+                      isLoading = false;
+                    });
+                  },
+                ),
+        ],
       ),
     );
   }
@@ -183,13 +185,13 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
             .inputDecorationTheme
             .border
             ?.copyWith(borderSide: const BorderSide(color: kPrimaryColor)),
-        label: Text(
+        label: const Text(
           "Adress",
           style: TextStyle(color: kTextColor),
         ),
         hintText: "Enter your adress",
         suffixIcon:
-            CustomSuffixIcon(svgIcon: "assets/icons/Location point.svg"),
+            const CustomSuffixIcon(svgIcon: "assets/icons/Location point.svg"),
       ),
       onSaved: (newValue) {
         adress = newValue!;
@@ -224,12 +226,12 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
             .inputDecorationTheme
             .border
             ?.copyWith(borderSide: const BorderSide(color: kPrimaryColor)),
-        label: Text(
+        label: const Text(
           "Phone number",
           style: TextStyle(color: kTextColor),
         ),
         hintText: "Enter your phone number",
-        suffixIcon: CustomSuffixIcon(svgIcon: "assets/icons/Phone.svg"),
+        suffixIcon: const CustomSuffixIcon(svgIcon: "assets/icons/Phone.svg"),
       ),
       onSaved: (newValue) {
         phoneNumber = newValue!;
@@ -271,12 +273,12 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
             .inputDecorationTheme
             .border
             ?.copyWith(borderSide: const BorderSide(color: kPrimaryColor)),
-        label: Text(
+        label: const Text(
           "Full Name",
           style: TextStyle(color: kTextColor),
         ),
         hintText: "Enter your name",
-        suffixIcon: CustomSuffixIcon(svgIcon: "assets/icons/User.svg"),
+        suffixIcon: const CustomSuffixIcon(svgIcon: "assets/icons/User.svg"),
       ),
       onSaved: (newValue) {
         name = newValue!;

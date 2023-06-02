@@ -88,11 +88,13 @@ class _SplashScreenState extends State<SplashScreen> {
               Expanded(
                 flex: 2,
                 child: Padding(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: getProportionateScreenWidth(20)),
+                  padding: EdgeInsets.all(getProportionateScreenWidth(20)),
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      const Spacer(),
+                      SizedBox(
+                        height: getProportionateScreenWidth(20),
+                      ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: List.generate(
@@ -100,7 +102,8 @@ class _SplashScreenState extends State<SplashScreen> {
                           (index) => buildDot(index: index),
                         ),
                       ),
-                      const Spacer(flex: 2),
+                      const Spacer(),
+                      // const Spacer(flex: 2),
                       DefaultButton(
                         text: "Continue",
                         press: () {
@@ -108,7 +111,7 @@ class _SplashScreenState extends State<SplashScreen> {
                               .popAndPushNamed(SignInScreen.routeName);
                         },
                       ),
-                      const Spacer(),
+                      // const Spacer(),
                     ],
                   ),
                 ),

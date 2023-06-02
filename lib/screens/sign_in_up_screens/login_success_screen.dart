@@ -13,14 +13,16 @@ class LoginSuccessScreen extends StatelessWidget {
       appBar: newAppBar(),
       body: Column(
         children: [
-          SizedBox(height: SizeConfig.screenHeight * .04),
+          // SizedBox(height: SizeConfig.screenHeight * .04),
+          const Spacer(),
           Image.asset(
             "assets/images/success.png",
             height: SizeConfig.screenHeight * .4,
             width: double.infinity,
             fit: BoxFit.cover,
           ),
-          SizedBox(height: SizeConfig.screenHeight * .04),
+          const Spacer(),
+          // SizedBox(height: SizeConfig.screenHeight * .04),
           Text(
             "Login Success",
             style: TextStyle(
@@ -30,8 +32,9 @@ class LoginSuccessScreen extends StatelessWidget {
             ),
           ),
           const Spacer(),
-          SizedBox(
-            width: SizeConfig.screenWidth * .6,
+          Padding(
+            padding: EdgeInsets.symmetric(
+                horizontal: getProportionateScreenWidth(30)),
             child: DefaultButton(
               text: "Back to home",
               press: () {

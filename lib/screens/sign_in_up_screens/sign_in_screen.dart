@@ -52,51 +52,56 @@ class SignInScreen extends StatelessWidget {
         body: ScrollConfiguration(
           behavior: CustomScrollBehavior(),
           child: SingleChildScrollView(
-            // physics: _hasFocus
-            //     ? const BouncingScrollPhysics()
-            //     : const NeverScrollableScrollPhysics(),
             child: SafeArea(
                 child: SizedBox(
+              height: SizeConfig.getBodyHeight(),
               width: double.infinity,
               child: Padding(
                 padding: EdgeInsets.symmetric(
                     horizontal: getProportionateScreenWidth(20)),
-                child: Column(
-                  children: [
-                    Text(
-                      "Welcome Back",
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontSize: getProportionateScreenWidth(28),
-                          fontWeight: FontWeight.bold),
-                    ),
-                    const Text(
-                      "Sign in with your email and password \nor continue with social media",
-                      textAlign: TextAlign.center,
-                    ),
-                    SizedBox(height: SizeConfig.screenHeight * 0.08),
-                    const SignForm(),
-                    SizedBox(height: SizeConfig.screenHeight * 0.02),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SocialCard(
-                          icon: "assets/icons/facebook-2.svg",
-                          press: () {},
-                        ),
-                        SocialCard(
-                          icon: "assets/icons/google-icon.svg",
-                          press: () {},
-                        ),
-                        SocialCard(
-                          icon: "assets/icons/twitter.svg",
-                          press: () {},
-                        ),
-                      ],
-                    ),
-                    const NoAccountText(),
-                  ],
-                ),
+                child: LayoutBuilder(builder: (context, constraints) {
+                  final bodyHeight = constraints.maxHeight;
+                  return Column(
+                    children: [
+                      Text(
+                        "Welcome Back",
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: getProportionateScreenWidth(28),
+                            fontWeight: FontWeight.bold),
+                      ),
+                      const Text(
+                        "Sign in with your email and password \nor continue with social media",
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: bodyHeight * .08),
+                      SizedBox(
+                        height: bodyHeight * .6,
+                        child: const SignForm(),
+                      ),
+                      const Spacer(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SocialCard(
+                            icon: "assets/icons/facebook-2.svg",
+                            press: () {},
+                          ),
+                          SocialCard(
+                            icon: "assets/icons/google-icon.svg",
+                            press: () {},
+                          ),
+                          SocialCard(
+                            icon: "assets/icons/twitter.svg",
+                            press: () {},
+                          ),
+                        ],
+                      ),
+                      const NoAccountText(),
+                      const Spacer(),
+                    ],
+                  );
+                }),
               ),
             )),
           ),
@@ -144,84 +149,81 @@ class _SignFormState extends State<SignForm> {
   Widget build(BuildContext context) {
     return Form(
       key: _formKey,
-      child: SizedBox(
-        height: SizeConfig.screenHeight * 0.53,
-        child: Column(
-          children: [
-            buildEmailFormField(),
-            SizedBox(height: getProportionateScreenHeight(30)),
-            buildPasswordFormField(),
-            SizedBox(height: getProportionateScreenHeight(10)),
-            Row(
-              children: [
-                Checkbox(
-                  value: remember,
-                  onChanged: (value) {
-                    setState(() {
-                      remember = value!;
-                    });
-                  },
-                  activeColor: kPrimaryColor,
-                ),
-                const Text("Remember me"),
-                const Spacer(),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context)
-                        .pushNamed(ForgotPasswordScreen.routeName);
-                  },
-                  child: const Text(
-                    "Forgot Password",
-                    style: TextStyle(
-                      decoration: TextDecoration.underline,
-                      color: kPrimaryColor,
-                    ),
+      child: Column(
+        children: [
+          buildEmailFormField(),
+          SizedBox(height: getProportionateScreenHeight(30)),
+          buildPasswordFormField(),
+          SizedBox(height: getProportionateScreenHeight(10)),
+          Row(
+            children: [
+              Checkbox(
+                value: remember,
+                onChanged: (value) {
+                  setState(() {
+                    remember = value!;
+                  });
+                },
+                activeColor: kPrimaryColor,
+              ),
+              const Text("Remember me"),
+              const Spacer(),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context)
+                      .pushNamed(ForgotPasswordScreen.routeName);
+                },
+                child: const Text(
+                  "Forgot Password",
+                  style: TextStyle(
+                    decoration: TextDecoration.underline,
+                    color: kPrimaryColor,
                   ),
                 ),
-              ],
-            ),
-            FormError(errors: errors),
-            const Spacer(),
-            isLoading
-                ? const CircularProgressIndicator(color: kPrimaryColor)
-                : DefaultButton(
-                    text: "Continue",
-                    press: () async {
-                      setState(() {
-                        isLoading = true;
-                      });
-                      try {
-                        if (_formKey.currentState!.validate()) {
-                          if (errors.isEmpty) {
-                            _formKey.currentState?.save();
-                            await RepositoryProvider.of<AuthRepositiry>(context,
-                                    listen: false)
-                                .login(email, password, remember);
-                          }
-                        }
-                      } on HttpException catch (err) {
-                        showErrorDialog(context, err.toString());
-                      } catch (err) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(err.toString())));
-                      } finally {
-                        if (RepositoryProvider.of<AuthRepositiry>(context,
-                                listen: false)
-                            .isAuth) {
-                          setState(() {
-                            isLoading = false;
-                          });
-                          Navigator.of(context).pushReplacementNamed(
-                              LoginSuccessScreen.routeName);
+              ),
+            ],
+          ),
+          FormError(errors: errors),
+          const Spacer(),
+          isLoading
+              ? const CircularProgressIndicator(color: kPrimaryColor)
+              : DefaultButton(
+                  text: "Continue",
+                  press: () async {
+                    setState(() {
+                      isLoading = true;
+                    });
+                    try {
+                      if (_formKey.currentState!.validate()) {
+                        if (errors.isEmpty) {
+                          _formKey.currentState?.save();
+                          await RepositoryProvider.of<AuthRepositiry>(context,
+                                  listen: false)
+                              .login(email, password, remember);
                         }
                       }
-                      setState(() {
-                        isLoading = false;
-                      });
-                    },
-                  ),
-          ],
-        ),
+                    } on HttpException catch (err) {
+                      showErrorDialog(context, err.toString());
+                    } catch (err) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(err.toString())));
+                    } finally {
+                      if (RepositoryProvider.of<AuthRepositiry>(context,
+                              listen: false)
+                          .isAuth) {
+                        setState(() {
+                          isLoading = false;
+                        });
+                        Navigator.of(context)
+                            .pushReplacementNamed(LoginSuccessScreen.routeName);
+                      }
+                    }
+                    setState(() {
+                      isLoading = false;
+                    });
+                  },
+                ),
+        ],
       ),
     );
   }
