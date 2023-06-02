@@ -13,9 +13,17 @@ class SizeConfig {
       screenWidth = _mediaQueryData!.size.width;
       screenHeight = _mediaQueryData!.size.height;
       orientation = _mediaQueryData!.orientation;
+    }}
+
+    static double getBodyHeight() {
+      if (_mediaQueryData != null) {
+        double statusBarHeight = _mediaQueryData!.padding.top;
+        return screenHeight - statusBarHeight - kToolbarHeight;
+      }
+      return 0;
     }
   }
-}
+
 
 // Get the proportionate height as per screen size
 double getProportionateScreenHeight(double inputHeight) {
