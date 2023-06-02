@@ -1,5 +1,6 @@
 import 'package:e_commerce/repositories/auth_repository.dart';
 import 'package:e_commerce/screens/loading_screen.dart';
+import 'package:e_commerce/utils/CustomScrollBehavior.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -61,71 +62,83 @@ class _UserInformationEditScreenState extends State<UserInformationEditScreen> {
   @override
   Widget build(BuildContext context) {
     return !isLoading
-        ? Scaffold(
-            appBar: customAppBar(context),
-            body: Form(
-              key: _formKey,
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                    horizontal: getProportionateScreenWidth(20)),
-                child: Column(
-                  children: [
-                    const Spacer(),
-                    buildNameField(),
-                    SizedBox(height: getProportionateScreenHeight(30)),
-                    buildPhoneNumberField(),
-                    SizedBox(height: getProportionateScreenHeight(30)),
-                    buildAdressField(),
-                    SizedBox(height: getProportionateScreenHeight(20)),
-                    FormError(errors: errors),
-                    const Spacer(flex: 5),
-                    isInfUpdating
-                        ? const CircularProgressIndicator(color: kPrimaryColor)
-                        : DefaultButton(
-                            text: "Update Information",
-                            press: () async {
-                              setState(() {
-                                isInfUpdating = true;
-                              });
-                              if (_formKey.currentState!.validate()) {
-                                if (errors.isEmpty) {
-                                  _formKey.currentState?.save();
-                                  try {
-                                    await context
-                                        .read<AuthRepositiry>()
-                                        .updateUserInformation(UserInformation(
-                                          adress: adress,
-                                          name: name,
-                                          phoneNumber: phoneNumber,
-                                        ));
-                                  } on HttpException catch (err) {
-                                    showErrorDialog(context, err.toString());
-                                  } catch (err) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(
-                                            content: Text(err.toString())));
-                                  } finally {
-                                    showDialog(
-                                      context: context,
-                                      builder: (_) =>
-                                          const AlertDialogTextWithPic(
-                                        text:
-                                            "User information succefuly updated!",
-                                        svgSrc:
-                                            "assets/icons/Check mark rounde.svg",
-                                      ),
-                                    );
-                                  }
-                                }
-                              }
-                              setState(() {
-                                isInfUpdating = false;
-                              });
-                            },
-                          ),
-                    const Spacer(),
-                  ],
+        ? GestureDetector(
+            onTap: () {
+              FocusScope.of(context).unfocus();
+            },
+            child: Scaffold(
+              appBar: customAppBar(context),
+              body: Form(
+                key: _formKey,
+                child: ScrollConfiguration(
+                  behavior: CustomScrollBehavior(),
+                  child: SingleChildScrollView(
+                    child: Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: getProportionateScreenWidth(20)),
+                        child: Column(
+                          children: [
+                            SizedBox(height: getProportionateScreenWidth(30)),
+                            buildNameField(),
+                            SizedBox(height: getProportionateScreenWidth(30)),
+                            buildPhoneNumberField(),
+                            SizedBox(height: getProportionateScreenWidth(30)),
+                            buildAdressField(),
+                            SizedBox(height: getProportionateScreenWidth(30)),
+                            FormError(errors: errors),
+                          ],
+                        )),
+                  ),
                 ),
+              ),
+              bottomNavigationBar: Padding(
+                padding: EdgeInsets.all(getProportionateScreenHeight(20)),
+                child: isInfUpdating
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          CircularProgressIndicator(color: kPrimaryColor),
+                        ],
+                      )
+                    : DefaultButton(
+                        text: "Update Information",
+                        press: () async {
+                          setState(() {
+                            isInfUpdating = true;
+                          });
+                          if (_formKey.currentState!.validate()) {
+                            if (errors.isEmpty) {
+                              _formKey.currentState?.save();
+                              try {
+                                await context
+                                    .read<AuthRepositiry>()
+                                    .updateUserInformation(UserInformation(
+                                      adress: adress,
+                                      name: name,
+                                      phoneNumber: phoneNumber,
+                                    ));
+                              } on HttpException catch (err) {
+                                showErrorDialog(context, err.toString());
+                              } catch (err) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text(err.toString())));
+                              } finally {
+                                showDialog(
+                                  context: context,
+                                  builder: (_) => const AlertDialogTextWithPic(
+                                    text: "User information succefuly updated!",
+                                    svgSrc:
+                                        "assets/icons/Check mark rounde.svg",
+                                  ),
+                                );
+                              }
+                            }
+                          }
+                          setState(() {
+                            isInfUpdating = false;
+                          });
+                        },
+                      ),
               ),
             ),
           )
@@ -144,6 +157,8 @@ class _UserInformationEditScreenState extends State<UserInformationEditScreen> {
         suffixIcon:
             CustomSuffixIcon(svgIcon: "assets/icons/Location point.svg"),
       ),
+      minLines: 5,
+      maxLines: 5,
       initialValue: userInformation?.adress,
       onSaved: (newValue) {
         adress = newValue!;
