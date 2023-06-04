@@ -24,7 +24,10 @@ class CartScreen extends StatelessWidget {
   static const routeName = '/CartScreen';
 
   Future<void> _refresh(BuildContext context) async {
-    final bloc = context.read<CartBloc>().stream.first;
+    final bloc = context
+        .read<CartBloc>()
+        .stream
+        .firstWhere((state) => state.cartLoadStatus == CartLoadStatus.loaded);
     context.read<CartBloc>().add(RequestCart());
     await bloc;
   }

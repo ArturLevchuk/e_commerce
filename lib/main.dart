@@ -5,10 +5,10 @@ import 'constants.dart';
 import 'package:flutter/material.dart';
 import 'screens/app/app.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Bloc.observer = CustomBlocObserver();
-  AwesomeNotifications().initialize(
+  await AwesomeNotifications().initialize(
     'resource://drawable/ic_launcher',
     [
       NotificationChannel(

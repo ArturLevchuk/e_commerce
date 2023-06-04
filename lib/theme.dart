@@ -4,6 +4,7 @@ import 'constants.dart';
 
 ThemeData theme() {
   return ThemeData(
+    brightness: Brightness.light,
     scaffoldBackgroundColor: Colors.white,
     fontFamily: "Muli",
     appBarTheme: appBarTheme(),
@@ -20,11 +21,8 @@ InputDecorationTheme inputDecorationTheme() {
     gapPadding: 10,
   );
   return InputDecorationTheme(
-    // If  you are using latest version of flutter then lable text and hint text shown like this
-    // if you r using flutter less then 1.20.* then maybe this is not working properly
-    // if we are define our floatingLabelBehavior in our theme then it's not applayed
     floatingLabelBehavior:
-        FloatingLabelBehavior.always, //доп надпись слева вверху как подсказка
+        FloatingLabelBehavior.always, //доп надпис зверху як підказка
     contentPadding: const EdgeInsets.symmetric(horizontal: 42, vertical: 20),
     enabledBorder: outlineInputBorder,
     focusedBorder: outlineInputBorder,
@@ -43,10 +41,12 @@ AppBarTheme appBarTheme() {
   return const AppBarTheme(
     color: Colors.white,
     elevation: 0,
-    brightness: Brightness.light,
+
+    // brightness: Brightness.light,
     iconTheme: IconThemeData(color: Colors.black),
-    textTheme: TextTheme(
-      headline6: TextStyle(color: Color(0XFF8B8B8B), fontSize: 18),
-    ),
+    titleTextStyle: TextStyle(color: Color(0XFF8B8B8B), fontSize: 18),
+    // textTheme: TextTheme(
+    //   headline6: TextStyle(color: Color(0XFF8B8B8B), fontSize: 18),
+    // ),
   );
 }

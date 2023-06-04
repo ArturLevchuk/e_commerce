@@ -28,7 +28,8 @@ class _OrdersScreenState extends State<OrdersScreen> {
   }
 
   Future<void> _refresh() async {
-    final bloc = context.read<OrdersBloc>().stream.first;
+    final bloc = context.read<OrdersBloc>().stream.firstWhere(
+        (state) => state.ordersLoadStatus == OrdersLoadStatus.loaded);
     context.read<OrdersBloc>().add(RequestOrders());
     await bloc;
   }

@@ -83,6 +83,11 @@ class _HomeScreenState extends State<HomeScreen>
       begin: Offset.zero,
       end: const Offset(-1.0, 0.0),
     ).animate(_controller);
+    _offsetAnimation.addStatusListener((status) async {
+      if (status == AnimationStatus.completed) {
+        await notificationsPermissonsCheck();
+      }
+    });
     super.initState();
   }
 
@@ -120,34 +125,29 @@ class _HomeScreenState extends State<HomeScreen>
         return Stack(
           children: [
             if (state.productsLoadStatus == ProductsLoadStatus.loaded)
-              FutureBuilder(
-                future: Future.delayed(const Duration(seconds: 2), () async {
-                  await notificationsPermissonsCheck();
-                }),
-                builder: (context, snapshot) => Scaffold(
-                  extendBody: true,
-                  body: SafeArea(
-                    bottom: false,
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          SizedBox(height: getProportionateScreenHeight(25)),
-                          const DiscountBanner(),
-                          SizedBox(height: getProportionateScreenHeight(25)),
-                          const Categories(),
-                          SizedBox(height: getProportionateScreenHeight(15)),
-                          const SpecialOffers(),
-                          SizedBox(height: getProportionateScreenHeight(15)),
-                          const PopularProducts(),
-                          const SizedBox(
-                              height: kBottomNavigationBarHeight * 1.2),
-                        ],
-                      ),
+              Scaffold(
+                extendBody: true,
+                body: SafeArea(
+                  bottom: false,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        SizedBox(height: getProportionateScreenHeight(25)),
+                        const DiscountBanner(),
+                        SizedBox(height: getProportionateScreenHeight(25)),
+                        const Categories(),
+                        SizedBox(height: getProportionateScreenHeight(15)),
+                        const SpecialOffers(),
+                        SizedBox(height: getProportionateScreenHeight(15)),
+                        const PopularProducts(),
+                        const SizedBox(
+                            height: kBottomNavigationBarHeight * 1.2),
+                      ],
                     ),
                   ),
-                  bottomNavigationBar: CustomNavigationBar(
-                    currentIndex: MenuState.home.index,
-                  ),
+                ),
+                bottomNavigationBar: CustomNavigationBar(
+                  currentIndex: MenuState.home.index,
                 ),
               ),
             if (state.productsLoadStatus == ProductsLoadStatus.error)

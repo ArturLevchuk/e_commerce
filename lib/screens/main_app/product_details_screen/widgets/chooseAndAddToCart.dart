@@ -8,7 +8,7 @@ import '../../../../widgets/AlertDialogTextWithPic.dart';
 import '../../../../widgets/DefaultButton.dart';
 import '../../../../widgets/RoundedIconBtn.dart';
 import '../../cart/cart_bloc/cart_bloc.dart';
-import 'TopRoundedContainer.dart';
+import 'topRoundedContainer.dart';
 
 class ChooseAndAddToCart extends StatefulWidget {
   const ChooseAndAddToCart({

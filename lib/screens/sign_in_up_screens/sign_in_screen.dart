@@ -6,6 +6,7 @@ import 'package:e_commerce/size_config.dart';
 import 'package:e_commerce/utils/CustomScrollBehavior.dart';
 import 'package:e_commerce/widgets/DefaultButton.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../utils/HttpException.dart';
 import '../../widgets/CustomSuffixIcon.dart';
@@ -135,6 +136,7 @@ class _SignFormState extends State<SignForm> {
   String password = "";
   bool remember = true;
   bool isLoading = false;
+  bool obscureText = true;
   final FocusNode _emailFocusNode = FocusNode();
   final FocusNode _passFocusNode = FocusNode();
 
@@ -279,6 +281,9 @@ class _SignFormState extends State<SignForm> {
     return TextFormField(
       focusNode: _passFocusNode,
       keyboardType: TextInputType.emailAddress,
+      inputFormatters: [
+        FilteringTextInputFormatter.deny(RegExp(r'^\s')),
+      ],
       decoration: InputDecoration(
         focusedBorder: Theme.of(context)
             .inputDecorationTheme
@@ -292,7 +297,7 @@ class _SignFormState extends State<SignForm> {
         suffixIcon: const CustomSuffixIcon(svgIcon: "assets/icons/Mail.svg"),
       ),
       onSaved: (newValue) {
-        email = newValue!;
+        email = newValue!.trim();
       },
       onChanged: (value) {
         if (value.isNotEmpty && errors.contains(kEmailNullError)) {
@@ -307,7 +312,8 @@ class _SignFormState extends State<SignForm> {
         }
       },
       validator: (value) {
-        if (value!.isEmpty && !errors.contains(kEmailNullError)) {
+        if (value == null) return;
+        if (value.isEmpty && !errors.contains(kEmailNullError)) {
           setState(() {
             errors.add(kEmailNullError);
           });

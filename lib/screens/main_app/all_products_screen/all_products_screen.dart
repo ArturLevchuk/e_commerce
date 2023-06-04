@@ -62,13 +62,17 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
     textEditingController = TextEditingController();
     textEditingController.addListener(() {
       if (textEditingController.text.length > 2) {
-        setState(() {
-          clearField = true;
-        });
+        if (!clearField) {
+          setState(() {
+            clearField = true;
+          });
+        }
       } else {
-        setState(() {
-          clearField = false;
-        });
+        if (clearField) {
+          setState(() {
+            clearField = false;
+          });
+        }
       }
     });
     textFieldFocusNode = FocusNode();
@@ -153,7 +157,6 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
               bottomNavigationBar:
                   CustomNavigationBar(currentIndex: MenuState.catalog.index),
               endDrawer: showDrawer(drawerScreen),
-              
             );
           },
         ),

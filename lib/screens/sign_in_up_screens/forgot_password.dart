@@ -1,3 +1,4 @@
+import 'package:e_commerce/utils/CustomScrollBehavior.dart';
 import 'package:flutter/material.dart';
 
 import '../../constants.dart';
@@ -16,24 +17,6 @@ class ForgotPasswordScreen extends StatefulWidget {
 }
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
-  final FocusNode _focusNode = FocusNode();
-  bool _hasFocus = false;
-  @override
-  void initState() {
-    _focusNode.addListener(() {
-      setState(() {
-        _hasFocus = _focusNode.hasFocus;
-      });
-    });
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _focusNode.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -42,32 +25,43 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       },
       child: Scaffold(
         appBar: newAppBar(context),
-        body: Padding(
-          padding:
-              EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(20)),
+        body: ScrollConfiguration(
+          behavior: CustomScrollBehavior(),
           child: SingleChildScrollView(
-            physics: _hasFocus
-                ? const BouncingScrollPhysics()
-                : const NeverScrollableScrollPhysics(),
-            child: Column(
-              children: [
-                SizedBox(height: SizeConfig.screenHeight * 0.1),
-                Text(
-                  "Forgot Password",
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontSize: getProportionateScreenWidth(28),
-                      fontWeight: FontWeight.bold),
-                ),
-                const Text(
-                  "Please enter your email and we will send \nyou a link to return your account",
-                  textAlign: TextAlign.center,
-                  softWrap: true,
-                ),
-                SizedBox(height: SizeConfig.screenHeight * 0.1),
-                ForgotPassForm(focusNode: _focusNode),
-                const NoAccountText(),
-              ],
+            child: SizedBox(
+              width: SizeConfig.screenWidth,
+              height: SizeConfig.getBodyHeight(),
+              child: LayoutBuilder(builder: (context, constraints) {
+                return Padding(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: getProportionateScreenWidth(20)),
+                  child: Column(
+                    children: [
+                      SizedBox(height: constraints.maxHeight * 0.1),
+                      Text(
+                        "Forgot Password",
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: getProportionateScreenWidth(28),
+                            fontWeight: FontWeight.bold),
+                      ),
+                      const Text(
+                        "Please enter your email and we will send \nyou a link to return your account",
+                        textAlign: TextAlign.center,
+                        softWrap: true,
+                      ),
+                      SizedBox(height: constraints.maxHeight * 0.1),
+                      SizedBox(
+                        height: constraints.maxHeight * 0.55,
+                        child: const ForgotPassForm(),
+                      ),
+                      const Spacer(),
+                      const NoAccountText(),
+                      const Spacer(),
+                    ],
+                  ),
+                );
+              }),
             ),
           ),
         ),
@@ -93,8 +87,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 }
 
 class ForgotPassForm extends StatefulWidget {
-  const ForgotPassForm({super.key, required this.focusNode});
-  final FocusNode focusNode;
+  const ForgotPassForm({super.key});
 
   @override
   State<ForgotPassForm> createState() => _ForgotPassFormState();
@@ -102,37 +95,34 @@ class ForgotPassForm extends StatefulWidget {
 
 class _ForgotPassFormState extends State<ForgotPassForm> {
   final _formKey = GlobalKey<FormState>();
+  final FocusNode _focusNode = FocusNode();
   final List<String> errors = [];
   String email = "";
 
-  get focusNode => widget.focusNode;
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: SizeConfig.screenHeight * 0.49,
-      child: Form(
-        key: _formKey,
-        child: Column(children: [
-          buildEmailFormField(),
-          SizedBox(height: getProportionateScreenHeight(20)),
-          FormError(errors: errors),
-          const Spacer(),
-          DefaultButton(
-            text: "Continue",
-            press: () {
-              if (_formKey.currentState!.validate()) {
-                _formKey.currentState?.save();
-              }
-            },
-          ),
-        ]),
-      ),
+    return Form(
+      key: _formKey,
+      child: Column(children: [
+        buildEmailFormField(),
+        SizedBox(height: getProportionateScreenHeight(20)),
+        FormError(errors: errors),
+        const Spacer(),
+        DefaultButton(
+          text: "Continue",
+          press: () {
+            if (_formKey.currentState!.validate()) {
+              _formKey.currentState?.save();
+            }
+          },
+        ),
+      ]),
     );
   }
 
   TextFormField buildEmailFormField() {
     return TextFormField(
-      focusNode: focusNode,
+      focusNode: _focusNode,
       keyboardType: TextInputType.emailAddress,
       decoration: InputDecoration(
         focusedBorder: Theme.of(context)
