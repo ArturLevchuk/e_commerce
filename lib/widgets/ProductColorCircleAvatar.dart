@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../size_config.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ProductColorCircleAvatar extends StatelessWidget {
   const ProductColorCircleAvatar({
@@ -12,8 +11,8 @@ class ProductColorCircleAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: getProportionateScreenWidth(12),
-      height: getProportionateScreenWidth(12),
+      width: 12.w,
+      height: 12.w,
       decoration: BoxDecoration(
         color: color,
         shape: BoxShape.circle,

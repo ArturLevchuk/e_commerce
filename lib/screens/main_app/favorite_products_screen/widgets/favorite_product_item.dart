@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../repositories/models/product.dart';
-import '../../../../size_config.dart';
 import '../../../../utils/customPageRouteBuilder.dart';
 import '../../product_details_screen/details_screen.dart';
 
@@ -21,50 +21,49 @@ class FavoriteProductItem extends StatelessWidget {
               moveTo: const DetailsScreen(), arguments: product.id),
         );
       },
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: getProportionateScreenWidth(20),
-          vertical: getProportionateScreenWidth(10),
+      child: RPadding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 10,
         ),
         child: SizedBox(
-          height: getProportionateScreenWidth(88),
+          height: 86.w,
           child: Row(
             children: [
               AspectRatio(
                 aspectRatio: 1,
                 child: Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(10).r,
                   decoration: BoxDecoration(
-                    color: const Color(0xfff5f6f9),
-                    borderRadius: BorderRadius.circular(15),
+                    // color: const Color(0xfff5f6f9),
+                    color: Theme.of(context).colorScheme.surface,
+                    borderRadius: BorderRadius.circular(15).r,
                   ),
                   child: FadeInImage.assetNetwork(
                     alignment: Alignment.center,
                     placeholder: "assets/images/box.png",
-                    image: product.images[0],
+                    image: product.images.first,
                   ),
                 ),
               ),
-              SizedBox(width: getProportionateScreenWidth(20)),
+              SizedBox(width: 20.w),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    const SizedBox(height: 5),
+                    const Spacer(flex: 2),
                     Text(
                       product.title,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Colors.black,
+                      style: TextStyle(
+                        fontSize: 15.sp,
+                        // color: Colors.black,
                         overflow: TextOverflow.ellipsis,
                       ),
                       maxLines: 2,
                     ),
-                    // const SizedBox(height: 10),
                     const Spacer(),
                     Text("\$${product.price}"),
-                    const SizedBox(height: 5),
+                    const Spacer(flex: 2),
                   ],
                 ),
               ),

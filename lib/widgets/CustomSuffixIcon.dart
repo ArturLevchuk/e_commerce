@@ -1,7 +1,7 @@
+import 'package:e_commerce/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
-import '../size_config.dart';
 
 class CustomSuffixIcon extends StatelessWidget {
   final String svgIcon;
@@ -12,16 +12,17 @@ class CustomSuffixIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.fromLTRB(
+    return RPadding(
+      padding: const EdgeInsets.fromLTRB(
         0,
-        getProportionateScreenWidth(20),
-        getProportionateScreenWidth(20),
-        getProportionateScreenWidth(20),
+        20,
+        20,
+        20,
       ),
       child: SvgPicture.asset(
         svgIcon,
-        height: getProportionateScreenHeight(18),
+        height: 14.w,
+        color: kgeneralTextColor,
       ),
     );
   }

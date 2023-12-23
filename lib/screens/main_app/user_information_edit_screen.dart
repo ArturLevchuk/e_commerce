@@ -4,15 +4,17 @@ import 'package:e_commerce/utils/CustomScrollBehavior.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../constants.dart';
 import '../../repositories/models/user_information.dart';
 import '../../size_config.dart';
 import '../../utils/HttpException.dart';
-import '../../widgets/AlertDialogTextWithPic.dart';
+import '../../widgets/alert_dialog_with_pic.dart';
 import '../../widgets/CustomSuffixIcon.dart';
-import '../../widgets/DefaultButton.dart';
-import '../sign_in_up_screens/widgets/FormError.dart';
-import '../sign_in_up_screens/widgets/erros_show.dart';
+import '../../widgets/default_button.dart';
+import '../../widgets/back_appbar_button.dart';
+import '../auth_module/widgets/error_form.dart';
+import '../auth_module/widgets/errors_show.dart';
 
 class UserInformationEditScreen extends StatefulWidget {
   const UserInformationEditScreen({super.key});
@@ -26,27 +28,27 @@ class UserInformationEditScreen extends StatefulWidget {
 class _UserInformationEditScreenState extends State<UserInformationEditScreen> {
   @override
   void didChangeDependencies() async {
-    if (userInformation == null) {
-      setState(() {
-        isLoading = true;
-      });
-      try {
-        userInformation =
-            await context.read<AuthRepositiry>().getUserInformation();
-      } on HttpException catch (err) {
-        showErrorDialog(context, err.toString()).then((_) {
-          Navigator.of(context).pop();
-        });
-      } catch (err) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(err.toString())));
-      } finally {
-        setState(() {
-          isLoading = false;
-        });
-      }
-    }
     super.didChangeDependencies();
+    if (userInformation != null) return;
+    setState(() {
+      isLoading = true;
+    });
+    try {
+      userInformation =
+          await context.read<AuthRepositiry>().getUserInformation();
+    } on HttpException catch (err) {
+      // ignore: use_build_context_synchronously
+      showErrorDialog(context, err.toString()).then((_) {
+        Navigator.of(context).pop();
+      });
+    } catch (err) {
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(err.toString())));
+    }
+    setState(() {
+      isLoading = false;
+    });
   }
 
   final _formKey = GlobalKey<FormState>();
@@ -62,84 +64,75 @@ class _UserInformationEditScreenState extends State<UserInformationEditScreen> {
   @override
   Widget build(BuildContext context) {
     return !isLoading
-        ? GestureDetector(
-            onTap: () {
-              FocusScope.of(context).unfocus();
-            },
-            child: Scaffold(
-              appBar: customAppBar(context),
-              body: Form(
-                key: _formKey,
-                child: ScrollConfiguration(
-                  behavior: CustomScrollBehavior(),
-                  child: SingleChildScrollView(
-                    child: Padding(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: getProportionateScreenWidth(20)),
-                        child: Column(
-                          children: [
-                            SizedBox(height: getProportionateScreenWidth(30)),
-                            buildNameField(),
-                            SizedBox(height: getProportionateScreenWidth(30)),
-                            buildPhoneNumberField(),
-                            SizedBox(height: getProportionateScreenWidth(30)),
-                            buildAdressField(),
-                            SizedBox(height: getProportionateScreenWidth(30)),
-                            FormError(errors: errors),
-                          ],
-                        )),
-                  ),
-                ),
+        ? Scaffold(
+            appBar: appBar(context),
+            body: Form(
+              key: _formKey,
+              child: SingleChildScrollView(
+                child: RPadding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      children: [
+                        SizedBox(height: 30.w),
+                        buildNameField(),
+                        SizedBox(height: 30.w),
+                        buildPhoneNumberField(),
+                        SizedBox(height: 30.w),
+                        buildAdressField(),
+                        SizedBox(height: 30.w),
+                        FormError(errors: errors),
+                      ],
+                    )),
               ),
-              bottomNavigationBar: Padding(
-                padding: EdgeInsets.all(getProportionateScreenHeight(20)),
-                child: isInfUpdating
-                    ? Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          CircularProgressIndicator(color: kPrimaryColor),
-                        ],
-                      )
-                    : DefaultButton(
-                        text: "Update Information",
-                        press: () async {
-                          setState(() {
-                            isInfUpdating = true;
-                          });
-                          if (_formKey.currentState!.validate()) {
-                            if (errors.isEmpty) {
-                              _formKey.currentState?.save();
-                              try {
-                                await context
-                                    .read<AuthRepositiry>()
-                                    .updateUserInformation(UserInformation(
-                                      adress: adress,
-                                      name: name,
-                                      phoneNumber: phoneNumber,
-                                    ));
-                              } on HttpException catch (err) {
-                                showErrorDialog(context, err.toString());
-                              } catch (err) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text(err.toString())));
-                              } finally {
-                                showDialog(
-                                  context: context,
-                                  builder: (_) => const AlertDialogTextWithPic(
-                                    text: "User information succefuly updated!",
-                                    svgSrc:
-                                        "assets/icons/Check mark rounde.svg",
-                                  ),
-                                );
-                              }
+            ),
+            bottomNavigationBar: RPadding(
+              padding: const EdgeInsets.all(20),
+              child: isInfUpdating
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CircularProgressIndicator(
+                            color: Theme.of(context).colorScheme.primary),
+                      ],
+                    )
+                  : DefaultButton(
+                      text: "Update Information",
+                      press: () async {
+                        setState(() {
+                          isInfUpdating = true;
+                        });
+                        if (_formKey.currentState!.validate()) {
+                          if (errors.isEmpty) {
+                            _formKey.currentState?.save();
+                            try {
+                              await context
+                                  .read<AuthRepositiry>()
+                                  .updateUserInformation(UserInformation(
+                                    adress: adress,
+                                    name: name,
+                                    phoneNumber: phoneNumber,
+                                  ));
+                            } on HttpException catch (err) {
+                              await showErrorDialog(context, err.toString());
+                            } catch (err) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(err.toString())));
+                            } finally {
+                              await showDialog(
+                                context: context,
+                                builder: (_) => const AlertDialogTextWithPic(
+                                  text: "User information succefuly updated!",
+                                  svgSrc: "assets/icons/Check mark rounde.svg",
+                                ),
+                              );
                             }
                           }
-                          setState(() {
-                            isInfUpdating = false;
-                          });
-                        },
-                      ),
-              ),
+                        }
+                        setState(() {
+                          isInfUpdating = false;
+                        });
+                      },
+                    ),
             ),
           )
         : const LoadingScreen();
@@ -148,16 +141,12 @@ class _UserInformationEditScreenState extends State<UserInformationEditScreen> {
   TextFormField buildAdressField() {
     return TextFormField(
       keyboardType: TextInputType.streetAddress,
-      decoration: const InputDecoration(
-        label: Text(
-          "Adress",
-          style: TextStyle(color: kTextColor),
-        ),
-        hintText: "Enter your adress",
+      decoration: roundInputDecoration.copyWith(
+        labelText: "Adress",
         suffixIcon:
-            CustomSuffixIcon(svgIcon: "assets/icons/Location point.svg"),
+            const CustomSuffixIcon(svgIcon: "assets/icons/Location point.svg"),
       ),
-      minLines: 5,
+
       maxLines: 5,
       initialValue: userInformation?.adress,
       onSaved: (newValue) {
@@ -187,13 +176,9 @@ class _UserInformationEditScreenState extends State<UserInformationEditScreen> {
       inputFormatters: [
         LengthLimitingTextInputFormatter(13),
       ],
-      decoration: const InputDecoration(
-        label: Text(
-          "Phone number",
-          style: TextStyle(color: kTextColor),
-        ),
-        hintText: "Enter your phone number",
-        suffixIcon: CustomSuffixIcon(svgIcon: "assets/icons/Phone.svg"),
+      decoration: roundInputDecoration.copyWith(
+        labelText: "Phone number",
+        suffixIcon: const CustomSuffixIcon(svgIcon: "assets/icons/Phone.svg"),
       ),
       initialValue: userInformation?.phoneNumber,
       onSaved: (newValue) {
@@ -230,13 +215,9 @@ class _UserInformationEditScreenState extends State<UserInformationEditScreen> {
   TextFormField buildNameField() {
     return TextFormField(
       keyboardType: TextInputType.name,
-      decoration: const InputDecoration(
-        label: Text(
-          "Full Name",
-          style: TextStyle(color: kTextColor),
-        ),
-        hintText: "Enter your name",
-        suffixIcon: CustomSuffixIcon(svgIcon: "assets/icons/User.svg"),
+      decoration: roundInputDecoration.copyWith(
+        labelText: "Full Name",
+        suffixIcon: const CustomSuffixIcon(svgIcon: "assets/icons/User.svg"),
       ),
       initialValue: userInformation?.name,
       onSaved: (newValue) {
@@ -260,24 +241,17 @@ class _UserInformationEditScreenState extends State<UserInformationEditScreen> {
     );
   }
 
-  AppBar customAppBar(BuildContext context) {
+  AppBar appBar(BuildContext context) {
     return AppBar(
       elevation: 1,
       centerTitle: true,
       title: Text(
         "User Information",
         style: TextStyle(
-          color: Colors.black,
-          fontSize: getProportionateScreenWidth(18),
+          color: Theme.of(context).colorScheme.onSurface,
         ),
       ),
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios),
-        splashRadius: getProportionateScreenWidth(25),
-        onPressed: () {
-          Navigator.of(context).pop();
-        },
-      ),
+      leading: backAppBarButton(context),
     );
   }
 }

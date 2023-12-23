@@ -31,6 +31,7 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
           productsLoadStatus: ProductsLoadStatus.error, error: err.toString()));
     }
   }
+  
 
   void _onToggleFav(
     ToggleFav event,

@@ -1,8 +1,9 @@
 import 'dart:convert';
-import 'dart:ui';
 import 'package:dio/dio.dart';
 import 'package:e_commerce/utils/HttpException.dart';
 import 'models/product.dart';
+
+const String webPlatform = "https://e-commerce-26828-default-rtdb.firebaseio.com";
 
 class ProductsRepository {
   final String userId;
@@ -13,7 +14,7 @@ class ProductsRepository {
   Future<List<Product>> fetchAndSetProducts() async {
     try {
       final url = Uri.parse(
-          'https://e-commerce-26828-default-rtdb.firebaseio.com/products.json?auth=$authToken');
+          '$webPlatform/products.json?auth=$authToken');
       final response = await Dio().getUri(url);
       final extractedData = response.data as Map<String, dynamic>?;
       if (extractedData == null) {
@@ -21,7 +22,7 @@ class ProductsRepository {
             "Looks like something happend on server. Please try later.");
       }
       final favUrl = Uri.parse(
-          'https://e-commerce-26828-default-rtdb.firebaseio.com/userFavorites/$userId.json?auth=$authToken');
+          '$webPlatform/userFavorites/$userId.json?auth=$authToken');
       final favResponse = await Dio().getUri(favUrl);
       final favData = favResponse.data;
 
@@ -30,7 +31,7 @@ class ProductsRepository {
         loadedProducts.add(Product.fromJson(prodId, prodData, favData));
       });
       return loadedProducts;
-    } on HttpException catch (err) {
+    } on HttpException {
       rethrow;
     } catch (err) {
       throw HttpException((err as DioError).error.toString());
@@ -42,7 +43,7 @@ class ProductsRepository {
     final oldStatus = isFavorite;
     isFavorite = !isFavorite;
     final url = Uri.parse(
-        'https://e-commerce-26828-default-rtdb.firebaseio.com/userFavorites/$userId/$id.json?auth=$authToken');
+        '$webPlatform/userFavorites/$userId/$id.json?auth=$authToken');
 
     try {
       if (!oldStatus) {

@@ -6,8 +6,10 @@ import 'package:e_commerce/screens/main_app/orders/orders_bloc/orders_bloc.dart'
 import 'package:e_commerce/size_config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../../widgets/back_appbar_button.dart';
 import '../../loading_screen.dart';
-import 'widgets/orderItemCard.dart';
+import 'widgets/order_Item_card.dart';
 
 class OrdersScreen extends StatefulWidget {
   const OrdersScreen({super.key});
@@ -41,31 +43,20 @@ class _OrdersScreenState extends State<OrdersScreen> {
         if (state.ordersLoadStatus == OrdersLoadStatus.loaded) {
           final ordersProvItems = state.orders;
           return Scaffold(
-            appBar: AppBar(
-              title: Text(
-                'Orders',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: getProportionateScreenWidth(18),
-                ),
-              ),
-              leading: IconButton(
-                  icon: const Icon(Icons.arrow_back_ios),
-                  splashRadius: getProportionateScreenWidth(25),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  }),
-              titleSpacing: 0,
-            ),
+            appBar: appBar(context),
             body: CustomRefreshIndicator(
               builder: MaterialIndicatorDelegate(
+                backgroundColor: Theme.of(context).colorScheme.surface,
                 builder: (context, controller) {
                   final indicator = controller.value.clamp(0.0, 1.0);
                   return Transform.rotate(
                     angle: 2 * pi * controller.value,
                     child: Icon(
                       Icons.refresh,
-                      color: kPrimaryColor.withOpacity(indicator),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .primary
+                          .withOpacity(indicator),
                     ),
                   );
                 },
@@ -79,22 +70,19 @@ class _OrdersScreenState extends State<OrdersScreen> {
                         SliverFillRemaining(
                           child: Center(
                             child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    "Looks like no orders yet",
-                                    style:
-                                        Theme.of(context).textTheme.headline5,
-                                  ),
-                                  SizedBox(
-                                    width: SizeConfig.screenWidth * .8,
-                                    child: AspectRatio(
-                                      aspectRatio: 1,
-                                      child: Image.asset(
-                                          "assets/images/orders list.jpg"),
-                                    ),
-                                  ),
-                                ]),
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  "Looks like no orders yet",
+                                  style: Theme.of(context).textTheme.headline5,
+                                ),
+                                AspectRatio(
+                                  aspectRatio: 1,
+                                  child: Image.asset(
+                                      "assets/images/orders list.png"),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ],
@@ -102,30 +90,40 @@ class _OrdersScreenState extends State<OrdersScreen> {
                   : ListView.builder(
                       // physics: BouncingScrollPhysics(),
                       itemBuilder: (context, index) {
-                        return Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: getProportionateScreenWidth(20),
+                        return RPadding(
+                          padding: EdgeInsets.only(
+                            left: 20,
+                            right: 20,
+                            bottom:
+                                index == ordersProvItems.length - 1 ? 20 : 0,
                           ),
-                          child: Column(
-                            children: [
-                              OrderItemCard(
-                                orderItem: ordersProvItems[index],
-                              ),
-                              if (index == ordersProvItems.length - 1)
-                                SizedBox(
-                                  height: getProportionateScreenWidth(20),
-                                ),
-                            ],
+                          child: OrderItemCard(
+                            orderItem: ordersProvItems[index],
                           ),
                         );
                       },
-                      itemCount: ordersProvItems.length),
+                      itemCount: ordersProvItems.length,
+                    ),
             ),
           );
         } else {
           return const LoadingScreen();
         }
       },
+    );
+  }
+
+  AppBar appBar(BuildContext context) {
+    return AppBar(
+      title: Text(
+        'Orders',
+        style: TextStyle(
+          // color: Colors.black,
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
+      ),
+      leading: backAppBarButton(context),
+      titleSpacing: 0,
     );
   }
 }

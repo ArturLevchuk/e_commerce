@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
-import '../../../../size_config.dart';
 
 class Categories extends StatelessWidget {
   const Categories({super.key});
@@ -15,9 +14,8 @@ class Categories extends StatelessWidget {
       {"icon": "assets/icons/Gift Icon.svg", "text": "Daily Gift"},
       {"icon": "assets/icons/Discover.svg", "text": "More"},
     ];
-    return Padding(
-      padding:
-          EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(20)),
+    return RPadding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -50,21 +48,22 @@ class CategoryCard extends StatelessWidget {
     return GestureDetector(
       onTap: press,
       child: SizedBox(
-        width: getProportionateScreenWidth(55),
+        width: 55.w,
         child: Column(
           children: [
             AspectRatio(
               aspectRatio: 1,
               child: Container(
-                padding: EdgeInsets.all(getProportionateScreenWidth(15)),
+                padding: const EdgeInsets.all(19).r,
                 decoration: BoxDecoration(
-                  color: const Color(0xffffecdf),
-                  borderRadius: BorderRadius.circular(10),
+                  // color: const Color(0xffffecdf),
+                  color: Theme.of(context).colorScheme.surface,
+                  borderRadius: BorderRadius.circular(10).r,
                 ),
                 child: SvgPicture.asset(icon),
               ),
             ),
-            const SizedBox(height: 5),
+            SizedBox(height: 5.w),
             Text(text, textAlign: TextAlign.center),
           ],
         ),

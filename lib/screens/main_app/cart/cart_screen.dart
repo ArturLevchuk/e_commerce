@@ -2,12 +2,13 @@ import 'dart:math';
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:e_commerce/constants.dart';
 import 'package:e_commerce/screens/main_app/cart/cart_bloc/cart_bloc.dart';
-import 'package:e_commerce/screens/sign_in_up_screens/widgets/erros_show.dart';
+import 'package:e_commerce/screens/auth_module/widgets/errors_show.dart';
 import 'package:e_commerce/size_config.dart';
-import 'package:e_commerce/widgets/DefaultButton.dart';
+import 'package:e_commerce/widgets/default_button.dart';
 import 'package:e_commerce/widgets/ProductColorCircleAvatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../repositories/models/cart_item.dart';
 import '../../../repositories/models/product.dart';
@@ -16,8 +17,8 @@ import '../../../utils/CustomScrollBehavior.dart';
 import '../orders/orders_confirm_screen/orders_confirm_screen.dart';
 import '../home/products_bloc/products_bloc.dart';
 
-part './widgets/checkOutCard.dart';
-part './widgets/cartItemCard.dart';
+part 'widgets/check_out_card.dart';
+part 'widgets/cart_item_card.dart';
 
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
@@ -44,29 +45,31 @@ class CartScreen extends StatelessWidget {
       builder: (context, state) {
         final cartList = state.items;
         return Scaffold(
-          appBar: newAppBar(context),
-          body: Padding(
-            padding: EdgeInsets.symmetric(
-                horizontal: getProportionateScreenWidth(20)),
+          appBar: appBar(context),
+          body: RPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             child: cartList.isEmpty
                 ? Center(
-                    child: Column(mainAxisSize: MainAxisSize.min, children: [
-                      Text(
-                        "It's time for Shopping!",
-                        style: Theme.of(context).textTheme.headline5,
-                      ),
-                      SizedBox(
-                        width: SizeConfig.screenWidth * .8,
-                        child: AspectRatio(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          "It's time for Shopping!",
+                          style: Theme.of(context).textTheme.headline5,
+                        ),
+                        SizedBox(height: 10.w),
+                        AspectRatio(
                           aspectRatio: 1,
                           child: SvgPicture.asset(
-                              'assets/images/shopping-sale.svg'),
+                            'assets/images/shopping-sale.svg',
+                          ),
                         ),
-                      ),
-                    ]),
+                      ],
+                    ),
                   )
                 : CustomRefreshIndicator(
                     builder: MaterialIndicatorDelegate(
+                      backgroundColor: Theme.of(context).colorScheme.surface,
                       builder: (context, controller) {
                         final indicator = controller.value.clamp(0.0, 1.0);
                         return Transform.rotate(
@@ -86,10 +89,10 @@ class CartScreen extends StatelessWidget {
                         },
                       );
                     },
-                    child: ScrollConfiguration(
-                      behavior: CustomScrollBehavior(),
-                      child: ListView.builder(
-                        itemBuilder: (context, index) => Padding(
+                    child: ListView.builder(
+                      itemBuilder: (context, index) {
+                        final CartItem item = cartList.values.elementAt(index);
+                        return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 10),
                           child: Dismissible(
                             // key: Key(cartList.keys.elementAt(index)),
@@ -97,45 +100,57 @@ class CartScreen extends StatelessWidget {
                             direction: DismissDirection.endToStart,
                             background: Container(
                               padding:
-                                  const EdgeInsets.symmetric(horizontal: 20),
+                                  const EdgeInsets.symmetric(horizontal: 20).r,
                               decoration: BoxDecoration(
-                                color: const Color(0xffffe6e6),
-                                borderRadius: BorderRadius.circular(15),
+                                // color: const Color(0xffffe6e6),
+                                color: Colors.red,
+                                borderRadius: BorderRadius.circular(15).r,
                               ),
-                              child: Row(children: [
-                                const Spacer(),
-                                SvgPicture.asset("assets/icons/Trash.svg"),
+                              child: const Row(children: [
+                                Spacer(),
+                                Icon(Icons.delete, color: Colors.white),
                               ]),
                             ),
                             child: CartItemCard(
                               product: productListProv.state.prodById(
-                                cartList.values.elementAt(index).productId,
+                                item.productId,
                               ),
-                              color: cartList.values.elementAt(index).color,
-                              numOfItem:
-                                  cartList.values.elementAt(index).numOfItem,
+                              color: item.color,
+                              numOfItem: item.numOfItem,
                             ),
                             onDismissed: (direction) async {
                               context
                                   .read<CartBloc>()
                                   .add((RemoveFromCart(index: index)));
                             },
-                            confirmDismiss: (dir) {
+                            confirmDismiss: (_) {
                               return showDialog(
                                 context: context,
                                 builder: (context) => AlertDialog(
                                   title: const Text(
                                       'Are you sure to remove product?'),
                                   titlePadding: const EdgeInsets.only(
-                                      left: 24, right: 24, top: 24, bottom: 0),
+                                    left: 24,
+                                    right: 24,
+                                    top: 24,
+                                    bottom: 0,
+                                  ).r,
                                   actions: [
                                     TextButton(
-                                        child: const Text('Remove'),
+                                        child: const Text('Remove',
+                                            style:
+                                                TextStyle(color: Colors.red)),
                                         onPressed: () {
                                           Navigator.of(context).pop(true);
                                         }),
                                     TextButton(
-                                        child: const Text('Cancel'),
+                                        child: Text(
+                                          'Cancel',
+                                          style: TextStyle(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onSurface),
+                                        ),
                                         onPressed: () {
                                           Navigator.of(context).pop(false);
                                         }),
@@ -144,9 +159,9 @@ class CartScreen extends StatelessWidget {
                               );
                             },
                           ),
-                        ),
-                        itemCount: cartList.length,
-                      ),
+                        );
+                      },
+                      itemCount: cartList.length,
                     ),
                   ),
           ),
@@ -156,24 +171,24 @@ class CartScreen extends StatelessWidget {
     );
   }
 
-  AppBar newAppBar(BuildContext context) {
+  AppBar appBar(BuildContext context) {
     return AppBar(
       centerTitle: true,
       title: BlocBuilder<CartBloc, CartState>(
         builder: (context, state) {
-          return RichText(
+          return Text.rich(
             textAlign: TextAlign.center,
-            text: TextSpan(
-              style: Theme.of(context).textTheme.bodyText1,
+            TextSpan(
               children: [
                 TextSpan(
-                    text: "Your Cart\n",
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontSize: getProportionateScreenWidth(18))),
+                  text: "Your Cart\n",
+                  style: TextStyle(
+                      fontSize: 18.sp,
+                      color: Theme.of(context).colorScheme.onBackground),
+                ),
                 TextSpan(
                   text: "${state.items.length} items",
-                  style: const TextStyle(height: 1),
+                  style: const TextStyle(height: 1, color: kgeneralTextColor),
                 ),
               ],
             ),

@@ -1,8 +1,10 @@
-import 'package:e_commerce/constants.dart';
-import 'package:e_commerce/repositories/auth_repository.dart';
-import 'package:e_commerce/screens/main_app/orders/orders_screen.dart';
-import 'package:e_commerce/screens/main_app/user_information_edit_screen.dart';
-import 'package:e_commerce/size_config.dart';
+import '/screens/main_app/home/widgets/discount_banner.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import '/constants.dart';
+import '/repositories/auth_repository.dart';
+import '/screens/main_app/orders/orders_screen.dart';
+import '/screens/main_app/user_information_edit_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -10,39 +12,16 @@ import '../../routs.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
-  static const routeName = '/ProfileScreen';
+  static const String routeName = '/ProfileScreen';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: true,
-      appBar: newAppBar(context),
+      appBar: appBar(context),
       body: Column(
         children: [
-          Container(
-              alignment: Alignment.centerLeft,
-              margin: const EdgeInsets.symmetric(horizontal: 20),
-              width: double.infinity,
-              height: SizeConfig.screenHeight * 0.2,
-              padding: EdgeInsets.symmetric(
-                horizontal: getProportionateScreenWidth(20),
-              ),
-              decoration: BoxDecoration(
-                color: const Color(0xff4a3298),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: const Text.rich(
-                TextSpan(
-                  text: "A Summer Surprise\n",
-                  style: TextStyle(color: Colors.white),
-                  children: [
-                    TextSpan(
-                        text: "Cashback 20%",
-                        style: TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.bold)),
-                  ],
-                ),
-              )),
-          const SizedBox(height: 20),
+          const DiscountBanner(),
+          SizedBox(height: 20.w),
           const ProfileMenuList(),
         ],
       ),
@@ -52,12 +31,14 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  AppBar newAppBar(BuildContext context) {
+  AppBar appBar(BuildContext context) {
     return AppBar(
       centerTitle: true,
-      title: const Text(
+      title: Text(
         "Profile",
-        style: TextStyle(color: Colors.black),
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
       ),
     );
   }
@@ -128,10 +109,11 @@ class ProfileMenuItem extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: ListTile(
-        tileColor: Color(0xfff5f6f9),
+        // tileColor: Color(0xfff5f6f9),
+        tileColor: Theme.of(context).colorScheme.surface,
         leading: SvgPicture.asset(
           icon,
-          color: kPrimaryColor,
+          color: Theme.of(context).colorScheme.primary,
         ),
         title: Text(text),
         trailing: const Icon(Icons.arrow_forward_ios, size: 18),

@@ -1,7 +1,6 @@
-import 'package:e_commerce/constants.dart';
-import 'package:e_commerce/size_config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../repositories/models/product.dart';
 import '../../../routs.dart';
 import '../home/products_bloc/products_bloc.dart';
@@ -48,36 +47,27 @@ class AllProductsScreen extends StatefulWidget {
 }
 
 class _AllProductsScreenState extends State<AllProductsScreen> {
-  late TextEditingController textEditingController;
-  late FocusNode textFieldFocusNode;
+  final TextEditingController textEditingController = TextEditingController();
+  final FocusNode textFieldFocusNode = FocusNode();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  bool clearField = false;
-  DrawerScreen drawerScreen = DrawerScreen.sorting;
 
-  late final List<Product> allProducts;
+  DrawerScreen drawerScreen = DrawerScreen.sorting;
+  bool clearField = false;
+  bool textFieldFocused = false;
 
   @override
   void initState() {
-    allProducts = context.read<ProductsBloc>().state.items;
-    textEditingController = TextEditingController();
-    textEditingController.addListener(() {
-      if (textEditingController.text.length > 2) {
-        if (!clearField) {
-          setState(() {
-            clearField = true;
-          });
-        }
-      } else {
-        if (clearField) {
-          setState(() {
-            clearField = false;
-          });
-        }
-      }
-    });
-    textFieldFocusNode = FocusNode();
+    textEditingController.addListener(
+      () {
+        setState(() {
+          clearField = textEditingController.text.isNotEmpty;
+        });
+      },
+    );
     textFieldFocusNode.addListener(() {
-      setState(() {});
+      setState(() {
+        textFieldFocused = textFieldFocusNode.hasFocus;
+      });
     });
     super.initState();
   }
@@ -91,80 +81,79 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final List<Product> allProducts = context.read<ProductsBloc>().state.items;
     return BlocProvider(
       create: (context) => ProductsOrderSettingsBloc(),
-      child: GestureDetector(
-        onTap: () {
-          FocusScope.of(context).unfocus();
-        },
-        child:
-            BlocBuilder<ProductsOrderSettingsBloc, ProductsOrderSettingsState>(
-          builder: (context, state) {
-            final productsListBySearch = productsBySearch(
-                allProducts, textEditingController.text, state.sortFilter);
-            return Scaffold(
-              key: _scaffoldKey,
-              extendBody: true,
-              appBar: newAppBar(),
-              body: Column(
-                children: [
-                  DecoratedBox(
-                    decoration: const BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(color: Colors.black12),
+      child: BlocBuilder<ProductsOrderSettingsBloc, ProductsOrderSettingsState>(
+        builder: (context, state) {
+          final List<Product> productsListBySearch = productsBySearch(
+            allProducts,
+            textEditingController.text,
+            state.sortFilter,
+          );
+          return Scaffold(
+            key: _scaffoldKey,
+            extendBody: true,
+            appBar: appBar(),
+            body: Column(
+              children: [
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                    border: const Border(
+                      bottom: BorderSide(),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      SortingButton(
+                        title: "Sorting",
+                        subtitle: "by ${getSortType(state.sortFilter)}",
+                        icon: const Icon(Icons.swap_vert),
+                        press: () async {
+                          setState(() {
+                            drawerScreen = DrawerScreen.sorting;
+                          });
+                          _scaffoldKey.currentState?.openEndDrawer();
+                        },
                       ),
-                    ),
-                    child: Row(
-                      children: [
-                        SortingButton(
-                          title: "Sorting",
-                          subtitle: "by ${getSortType(state.sortFilter)}",
-                          icon: const Icon(Icons.swap_vert),
-                          press: () async {
-                            setState(() {
-                              drawerScreen = DrawerScreen.sorting;
-                            });
-                            _scaffoldKey.currentState?.openEndDrawer();
-                          },
-                        ),
-                        SortingButton(
-                          title: "Filter",
-                          subtitle: state.filterColors.isEmpty
-                              ? "not selected"
-                              : "${filteredProducts(productsListBySearch, state.filterColors).length} items found",
-                          icon: const Icon(Icons.filter_alt_sharp),
-                          press: () async {
-                            setState(() {
-                              drawerScreen = DrawerScreen.filters;
-                            });
-                            _scaffoldKey.currentState?.openEndDrawer();
-                          },
-                        ),
-                      ],
-                    ),
+                      SortingButton(
+                        title: "Filter",
+                        subtitle: state.filterColors.isEmpty
+                            ? "not selected"
+                            : "${filteredProducts(productsListBySearch, state.filterColors).length} items found",
+                        icon: const Icon(Icons.filter_alt_sharp),
+                        press: () async {
+                          setState(() {
+                            drawerScreen = DrawerScreen.filters;
+                          });
+                          _scaffoldKey.currentState?.openEndDrawer();
+                        },
+                      ),
+                    ],
                   ),
-                  SizedBox(height: getProportionateScreenWidth(5)),
-                  Expanded(
-                    child: ProductsGrid(
-                      products: state.filterColors.isNotEmpty
-                          ? filteredProducts(
-                              productsListBySearch, state.filterColors)
-                          : productsListBySearch,
-                    ),
+                ),
+                SizedBox(height: 5.w),
+                Expanded(
+                  child: ProductsGrid(
+                    products: state.filterColors.isNotEmpty
+                        ? filteredProducts(
+                            productsListBySearch, state.filterColors)
+                        : productsListBySearch,
                   ),
-                ],
-              ),
-              bottomNavigationBar:
-                  CustomNavigationBar(currentIndex: MenuState.catalog.index),
-              endDrawer: showDrawer(drawerScreen),
-            );
-          },
-        ),
+                ),
+              ],
+            ),
+            bottomNavigationBar:
+                CustomNavigationBar(currentIndex: MenuState.catalog.index),
+            endDrawer: showDrawer(drawerScreen),
+          );
+        },
       ),
     );
   }
 
-  AppBar newAppBar() {
+  AppBar appBar() {
     return AppBar(
       elevation: 1,
       actions: const [SizedBox.shrink()],
@@ -174,30 +163,33 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
         decoration: InputDecoration(
           enabledBorder: InputBorder.none,
           focusedBorder: InputBorder.none,
-          hintText: "Search Product....",
+          hintText: "Search product..",
           prefixIcon: Icon(
             Icons.search,
-            color: textFieldFocusNode.hasFocus ? kPrimaryColor : Colors.grey,
+            color: textFieldFocused
+                ? Theme.of(context).colorScheme.primary
+                : Colors.grey,
           ),
-          contentPadding: EdgeInsets.symmetric(
-            horizontal: getProportionateScreenWidth(5),
-            vertical: getProportionateScreenWidth(12),
-          ),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 5,
+            vertical: 12,
+          ).r,
           suffixIcon: clearField
               ? IconButton(
                   splashRadius: 20,
-                  padding: const EdgeInsets.only(top: 2),
                   icon: const Icon(
                     Icons.close,
-                    color: Colors.black54,
                   ),
                   onPressed: () {
                     textEditingController.text = '';
                     textFieldFocusNode.unfocus();
                   },
                 )
-              : null,
+              : const SizedBox.shrink(),
         ),
+        onTapOutside: (_) {
+          textFieldFocusNode.unfocus();
+        },
       ),
     );
   }

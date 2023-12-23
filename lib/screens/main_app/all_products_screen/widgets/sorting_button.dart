@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class SortingButton extends StatelessWidget {
   const SortingButton({
@@ -16,22 +17,20 @@ class SortingButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: press,
-      child: Padding(
+      child: RPadding(
         padding: const EdgeInsets.all(8.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             icon,
-            const SizedBox(width: 5),
+            SizedBox(width: 5.w),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  title,
-                  style: const TextStyle(color: Colors.black),
-                ),
+                Text(title,
+                    style: const TextStyle(fontWeight: FontWeight.w600)),
                 Text(
                   subtitle,
                   style: const TextStyle(height: 1),

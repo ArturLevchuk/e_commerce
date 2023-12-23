@@ -1,8 +1,8 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:e_commerce/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:e_commerce/size_config.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../routs.dart';
 import 'products_bloc/products_bloc.dart';
 import 'widgets/widgets.dart';
@@ -17,6 +17,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
+  bool showLoadingHomePreviewScreen = true;
   late final AnimationController _controller;
   late final Animation<Offset> _offsetAnimation;
 
@@ -33,10 +34,10 @@ class _HomeScreenState extends State<HomeScreen>
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                child: const Text(
+                child: Text(
                   'Remind me later',
                   style: TextStyle(
-                    color: kTextColor,
+                    color: Theme.of(context).textTheme.bodyText1?.color,
                     fontSize: 18,
                   ),
                 ),
@@ -45,10 +46,10 @@ class _HomeScreenState extends State<HomeScreen>
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                child: const Text(
+                child: Text(
                   'Don\'t Allow',
                   style: TextStyle(
-                    color: kTextColor,
+                    color: Theme.of(context).textTheme.bodyText1?.color,
                     fontSize: 18,
                   ),
                 ),
@@ -75,8 +76,9 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   void initState() {
+    super.initState();
     _controller = AnimationController(
-      duration: const Duration(seconds: 1),
+      duration: const Duration(milliseconds: 500),
       vsync: this,
     );
     _offsetAnimation = Tween<Offset>(
@@ -85,10 +87,12 @@ class _HomeScreenState extends State<HomeScreen>
     ).animate(_controller);
     _offsetAnimation.addStatusListener((status) async {
       if (status == AnimationStatus.completed) {
+        setState(() {
+          showLoadingHomePreviewScreen = false;
+        });
         await notificationsPermissonsCheck();
       }
     });
-    super.initState();
   }
 
   @override
@@ -100,6 +104,9 @@ class _HomeScreenState extends State<HomeScreen>
     if (context.read<ProductsBloc>().state.productsLoadStatus ==
         ProductsLoadStatus.loaded) {
       _controller.value = 1;
+      setState(() {
+        showLoadingHomePreviewScreen = false;
+      });
     }
     super.didChangeDependencies();
   }
@@ -113,11 +120,11 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<ProductsBloc, ProductsState>(
-      listenWhen: (previous, current) =>
-          previous.productsLoadStatus != current.productsLoadStatus,
+      // listenWhen: (previous, current) =>
+      //     previous.productsLoadStatus != current.productsLoadStatus,
       listener: (context, state) async {
         if (state.productsLoadStatus == ProductsLoadStatus.loaded &&
-            _controller.status != AnimationStatus.completed) {
+            _controller.status == AnimationStatus.dismissed) {
           _controller.forward();
         }
       },
@@ -132,13 +139,13 @@ class _HomeScreenState extends State<HomeScreen>
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
-                        SizedBox(height: getProportionateScreenHeight(25)),
+                        SizedBox(height: 20.w),
                         const DiscountBanner(),
-                        SizedBox(height: getProportionateScreenHeight(25)),
+                        SizedBox(height: 20.w),
                         const Categories(),
-                        SizedBox(height: getProportionateScreenHeight(15)),
+                        SizedBox(height: 10.w),
                         const SpecialOffers(),
-                        SizedBox(height: getProportionateScreenHeight(15)),
+                        SizedBox(height: 10.w),
                         const PopularProducts(),
                         const SizedBox(
                             height: kBottomNavigationBarHeight * 1.2),
@@ -162,11 +169,13 @@ class _HomeScreenState extends State<HomeScreen>
                   ),
                 ),
               ),
-            if (!_controller.isCompleted)
-              SlideTransition(
+            Visibility(
+              visible: showLoadingHomePreviewScreen,
+              child: SlideTransition(
                 position: _offsetAnimation,
-                child: const LoadingHomeScreenSplash(),
+                child: const LoadingHomePreviewScreen(),
               ),
+            ),
           ],
         );
       },

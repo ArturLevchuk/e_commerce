@@ -1,21 +1,22 @@
 import 'package:e_commerce/constants.dart';
 import 'package:e_commerce/screens/main_app/all_products_screen/all_products_screen.dart';
 import 'package:e_commerce/screens/main_app/cart/cart_bloc/cart_bloc.dart';
-import 'package:e_commerce/screens/sign_in_up_screens/complete_profile_screen.dart';
+import 'package:e_commerce/screens/auth_module/sign_up_screen/complete_profile_screen.dart';
 import 'package:e_commerce/screens/main_app/product_details_screen/details_screen.dart';
 import 'package:e_commerce/screens/main_app/favorite_products_screen/favorite_products_screen.dart';
-import 'package:e_commerce/screens/sign_in_up_screens/forgot_password.dart';
+import 'package:e_commerce/screens/auth_module/forgot_password_screen/forgot_password.dart';
 import 'package:e_commerce/screens/main_app/home/home_screen.dart';
-import 'package:e_commerce/screens/sign_in_up_screens/login_success_screen.dart';
+import 'package:e_commerce/screens/auth_module/login_success_screen.dart';
 import 'package:e_commerce/screens/main_app/orders/orders_confirm_screen/orders_confirm_screen.dart';
 import 'package:e_commerce/screens/main_app/orders/orders_screen.dart';
-import 'package:e_commerce/screens/sign_in_up_screens/otp_screen.dart';
+import 'package:e_commerce/screens/auth_module/otp_screen/otp_screen.dart';
 import 'package:e_commerce/screens/main_app/profile_screen.dart';
-import 'package:e_commerce/screens/sign_in_up_screens/sign_in_screen.dart';
-import 'package:e_commerce/screens/sign_in_up_screens/sign_up_screen.dart';
+import 'package:e_commerce/screens/auth_module/sign_in_screen/sign_in_screen.dart';
+import 'package:e_commerce/screens/auth_module/sign_up_screen/sign_up_screen.dart';
 import 'package:e_commerce/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'screens/main_app/cart/cart_screen.dart';
 import 'screens/main_app/user_information_edit_screen.dart';
@@ -38,8 +39,6 @@ final Map<String, WidgetBuilder> routes = {
   AllProductsScreen.routeName: (context) => const AllProductsScreen(),
   OrdersScreen.routeName: (context) => const OrdersScreen(),
   OrdersConfirmScreen.routeName: (context) => const OrdersConfirmScreen(),
-  // SortingScreen.routeName: (context) => const SortingScreen(),
-  // FiltersScreen.routeName: (context) => const FiltersScreen(),
   UserInformationEditScreen.routeName: (context) =>
       const UserInformationEditScreen(),
 };
@@ -47,8 +46,13 @@ final Map<String, WidgetBuilder> routes = {
 enum MenuState { home, catalog, favourite, cart, profile }
 
 class CustomNavigationBar extends StatefulWidget {
-  const CustomNavigationBar({super.key, required this.currentIndex});
+  const CustomNavigationBar({
+    super.key,
+    required this.currentIndex,
+    this.rounded = true,
+  });
   final int currentIndex;
+  final bool rounded;
 
   @override
   State<CustomNavigationBar> createState() => _CustomNavigationBarState();
@@ -72,19 +76,28 @@ class _CustomNavigationBarState extends State<CustomNavigationBar> {
       },
       builder: (context, state) {
         return Container(
-          decoration: const BoxDecoration(
-            borderRadius: BorderRadius.only(
-                topRight: Radius.circular(20), topLeft: Radius.circular(20)),
-            boxShadow: [
-              BoxShadow(color: Colors.black38, spreadRadius: 0, blurRadius: 5),
-            ],
+          decoration: BoxDecoration(
+            borderRadius: widget.rounded
+                ? const BorderRadius.only(
+                    topRight: Radius.circular(20),
+                    topLeft: Radius.circular(20),
+                  ).r
+                : BorderRadius.zero,
+            boxShadow: widget.rounded
+                ? [
+                    themedBoxShadow(Theme.of(context).brightness),
+                  ]
+                : [],
           ),
           child: ClipRRect(
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
-            ),
+            borderRadius: widget.rounded
+                ? const BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ).r
+                : BorderRadius.zero,
             child: BottomNavigationBar(
+              backgroundColor: Theme.of(context).colorScheme.surface,
               showSelectedLabels: false,
               showUnselectedLabels: false,
               selectedFontSize: 0,
@@ -102,7 +115,8 @@ class _CustomNavigationBarState extends State<CustomNavigationBar> {
                   );
                 } else if (value == MenuState.favourite.index) {
                   Navigator.of(context).pushReplacement(
-                    customFadePageRouteBuilder(moveTo: const FavoriteListScreen()),
+                    customFadePageRouteBuilder(
+                        moveTo: const FavoriteListScreen()),
                   );
                 } else if (value == MenuState.cart.index) {
                   Navigator.of(context).pushReplacement(
@@ -110,7 +124,8 @@ class _CustomNavigationBarState extends State<CustomNavigationBar> {
                   );
                 } else if (value == MenuState.catalog.index) {
                   Navigator.of(context).pushReplacement(
-                    customFadePageRouteBuilder(moveTo: const AllProductsScreen()),
+                    customFadePageRouteBuilder(
+                        moveTo: const AllProductsScreen()),
                   );
                 }
               },

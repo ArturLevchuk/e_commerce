@@ -1,69 +1,69 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../constants.dart';
-import '../size_config.dart';
 
-class IconBtnWithCounter extends StatelessWidget {
-  const IconBtnWithCounter({
-    Key? key,
-    required this.svgSrc,
-    this.numOfItems = 0,
-    required this.press,
-  }) : super(key: key);
+// class IconBtnWithCounter extends StatelessWidget {
+//   const IconBtnWithCounter({
+//     Key? key,
+//     required this.svgSrc,
+//     this.numOfItems = 0,
+//     required this.press,
+//   }) : super(key: key);
 
-  final String svgSrc;
-  final int numOfItems;
-  final GestureTapCallback press;
+//   final String svgSrc;
+//   final int numOfItems;
+//   final GestureTapCallback press;
 
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: press,
-      borderRadius: BorderRadius.circular(50),
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Container(
-            height: getProportionateScreenWidth(46),
-            width: getProportionateScreenWidth(46),
-            padding: EdgeInsets.all(getProportionateScreenWidth(12)),
-            decoration: BoxDecoration(
-              color: kSecondaryColor.withOpacity(.1),
-              shape: BoxShape.circle,
-            ),
-            child: SvgPicture.asset(svgSrc),
-          ),
-          if (numOfItems > 1)
-            Positioned(
-              right: 0,
-              top: 0,
-              child: Container(
-                height: getProportionateScreenWidth(16),
-                width: getProportionateScreenWidth(16),
-                decoration: BoxDecoration(
-                  color: const Color(0xffff4848),
-                  shape: BoxShape.circle,
-                  border: Border.all(width: 1.5, color: Colors.red),
-                ),
-                child: Center(
-                  child: Text(
-                    "$numOfItems",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: getProportionateScreenWidth(10),
-                      height: 1,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return InkWell(
+//       onTap: press,
+//       borderRadius: BorderRadius.circular(50).r,
+//       child: Stack(
+//         clipBehavior: Clip.none,
+//         children: [
+//           Container(
+//             height: 46.w,
+//             width: 46.w,
+//             padding: const EdgeInsets.all(11).r,
+//             decoration: BoxDecoration(
+//               color: kSecondaryColor.withOpacity(.1),
+//               shape: BoxShape.circle,
+//             ),
+//             child: SvgPicture.asset(svgSrc),
+//           ),
+//           if (numOfItems > 1)
+//             Positioned(
+//               right: 0,
+//               top: 0,
+//               child: Container(
+//                 height: 16.w,
+//                 width: 16.w,
+//                 decoration: BoxDecoration(
+//                   color: const Color(0xffff4848),
+//                   shape: BoxShape.circle,
+//                   border: Border.all(width: 1.5, color: Colors.red),
+//                 ),
+//                 child: Center(
+//                   child: Text(
+//                     "$numOfItems",
+//                     style: TextStyle(
+//                       color: Colors.white,
+//                       fontSize: 10.sp,
+//                       height: 1,
+//                       fontWeight: FontWeight.w600,
+//                     ),
+//                   ),
+//                 ),
+//               ),
+//             ),
+//         ],
+//       ),
+//     );
+//   }
+// }
 
 class IconWithCounter extends StatelessWidget {
   const IconWithCounter({
@@ -80,15 +80,15 @@ class IconWithCounter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: getProportionateScreenWidth(35),
-      height: getProportionateScreenWidth(30),
+      width: 35.w,
+      height: 30.w,
       child: Stack(
         clipBehavior: Clip.none,
         alignment: AlignmentDirectional.centerStart,
         children: [
           SizedBox(
-            height: getProportionateScreenWidth(24),
-            width: getProportionateScreenWidth(24),
+            height: 24.w,
+            width: 24.w,
             // padding: EdgeInsets.all(getProportionateScreenWidth(3)),
             child: SvgPicture.asset(
               svgSrc,
@@ -100,8 +100,8 @@ class IconWithCounter extends StatelessWidget {
               right: 0,
               top: 0,
               child: Container(
-                height: getProportionateScreenWidth(15),
-                width: getProportionateScreenWidth(15),
+                height: 15.w,
+                width: 15.w,
                 decoration: BoxDecoration(
                   color: const Color(0xffff4848),
                   shape: BoxShape.circle,
@@ -112,7 +112,7 @@ class IconWithCounter extends StatelessWidget {
                     "$numOfItems",
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: getProportionateScreenWidth(10),
+                      fontSize: 10.sp,
                       height: 1,
                       fontWeight: FontWeight.w600,
                     ),

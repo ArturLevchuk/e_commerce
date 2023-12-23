@@ -5,7 +5,7 @@ class OrderItem {
   final List<CartItem> products;
   final double totalPrice;
   final String arrivePlace;
-  final String payment;
+  final String _payment;
   final String status;
   final DateTime dateTime;
 
@@ -13,9 +13,15 @@ class OrderItem {
     required this.id,
     required this.products,
     required this.totalPrice,
-    required this.payment,
+    required String payment,
     required this.arrivePlace,
     this.status = "Order in processing...",
     required this.dateTime,
-  });
+  }) : _payment = payment;
+
+  String get payment {
+    return _payment.contains("Payment upon receipt")
+        ? "Payment upon receipt"
+        : "Paid by card";
+  }
 }

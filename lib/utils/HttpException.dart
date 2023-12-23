@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 class HttpException implements Exception {
   final String message;
 
@@ -5,7 +7,7 @@ class HttpException implements Exception {
 
   @override
   String toString() {
-    print(message);
+    log(message);
     final errMessage = message.split(' : ')[0];
     if (int.tryParse(errMessage) != null) {
       return "Service error $errMessage. Please try later";

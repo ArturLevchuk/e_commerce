@@ -3,8 +3,11 @@ import '../../../../repositories/models/product.dart';
 import '../products_order_settings_bloc/products_order_settings_bloc.dart';
 
 List<Product> productsBySearch(
-    List<Product> allProducts, String searchTag, SortType sortFilter) {
-  if (searchTag.length < 2) {
+  List<Product> allProducts,
+  String searchTag,
+  SortType sortFilter,
+) {
+  if (searchTag.isEmpty) {
     return sortedProducts(allProducts, sortFilter);
   }
   return sortedProducts(allProducts, sortFilter)

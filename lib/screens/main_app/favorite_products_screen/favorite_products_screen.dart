@@ -1,6 +1,7 @@
 import 'package:e_commerce/utils/CustomScrollBehavior.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../routs.dart';
 import '../../../size_config.dart';
@@ -16,8 +17,10 @@ class FavoriteListScreen extends StatelessWidget {
     return Scaffold(
       extendBody: true,
       appBar: AppBar(
-        titleTextStyle: TextStyle(
-            color: Colors.black, fontSize: getProportionateScreenWidth(18)),
+        titleTextStyle: Theme.of(context)
+            .appBarTheme
+            .titleTextStyle
+            ?.copyWith(color: Theme.of(context).colorScheme.onBackground),
         centerTitle: true,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -26,7 +29,7 @@ class FavoriteListScreen extends StatelessWidget {
               "Favorite List",
               textAlign: TextAlign.center,
             ),
-            SizedBox(width: getProportionateScreenWidth(5)),
+            SizedBox(width: 5.w),
             SvgPicture.asset(
               "assets/icons/Heart Icon_2.svg",
               color: Colors.red,
@@ -38,13 +41,10 @@ class FavoriteListScreen extends StatelessWidget {
         child: BlocBuilder<ProductsBloc, ProductsState>(
           builder: (context, state) {
             final favProductList = state.favItems;
-            return ScrollConfiguration(
-              behavior: CustomScrollBehavior(),
-              child: ListView.builder(
-                itemBuilder: (context, index) =>
-                    FavoriteProductItem(product: favProductList[index]),
-                itemCount: favProductList.length,
-              ),
+            return ListView.builder(
+              itemBuilder: (context, index) =>
+                  FavoriteProductItem(product: favProductList[index]),
+              itemCount: favProductList.length,
             );
           },
         ),

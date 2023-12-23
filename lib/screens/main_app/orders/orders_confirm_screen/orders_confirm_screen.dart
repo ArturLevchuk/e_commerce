@@ -1,26 +1,18 @@
-import 'package:e_commerce/constants.dart';
-import 'package:e_commerce/repositories/auth_repository.dart';
-import 'package:e_commerce/screens/main_app/orders/orders_bloc/orders_bloc.dart';
-import 'package:e_commerce/screens/main_app/orders/orders_confirm_screen/widgets/exit_dialog.dart';
-import 'package:e_commerce/screens/sign_in_up_screens/widgets/erros_show.dart';
-import 'package:e_commerce/utils/CustomScrollBehavior.dart';
-import 'package:e_commerce/utils/HttpException.dart';
-import 'package:e_commerce/widgets/DefaultButton.dart';
+import '/repositories/auth_repository.dart';
+import '/screens/main_app/orders/orders_bloc/orders_bloc.dart';
+import '/screens/main_app/orders/orders_confirm_screen/widgets/exit_dialog.dart';
+import '/screens/auth_module/widgets/errors_show.dart';
+import '/utils/HttpException.dart';
+import '/widgets/default_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../repositories/models/card_information.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../repositories/models/user_information.dart';
-import '../../../../size_config.dart';
-import '../../../../widgets/AlertDialogTextWithPic.dart';
-import '../../../../widgets/ShadowBloc.dart';
+import '../../../../widgets/alert_dialog_with_pic.dart';
 import '../../../loading_screen.dart';
 import '../../cart/cart_bloc/cart_bloc.dart';
-import 'widgets/CustomArrivePlaceTextField.dart';
-import 'widgets/card_input_fields.dart';
-
-enum PaymentType { card, cash }
-
-enum DeliveryPlaceType { defaultPlace, customPlace }
+import 'widgets/delivery_place_card.dart';
+import 'widgets/payment_input_card.dart';
 
 class OrdersConfirmScreen extends StatefulWidget {
   const OrdersConfirmScreen({super.key});
@@ -36,14 +28,9 @@ class _OrdersConfirmScreenState extends State<OrdersConfirmScreen> {
   final _formKeyDeliveryPlace = GlobalKey<FormState>();
   final _formKeyCard = GlobalKey<FormState>();
 
-  PaymentType _paymentType = PaymentType.cash;
-  DeliveryPlaceType _deliveryPlaceType = DeliveryPlaceType.defaultPlace;
-
   String deliveryArrivePlace = '';
-  // bool customArrivePlace = false;
-  // bool customArrivePlaceHasError = false;
+  String paymentInfo = 'Payment upon receipt';
 
-  CardInformation? cardInformation;
   UserInformation? userInformation;
   bool orderingProcess = false;
   bool isLoading = false;
@@ -57,6 +44,7 @@ class _OrdersConfirmScreenState extends State<OrdersConfirmScreen> {
       try {
         userInformation =
             await context.read<AuthRepositiry>().getUserInformation();
+        deliveryArrivePlace = userInformation!.adress;
         setState(() {
           isLoading = false;
         });
@@ -72,63 +60,34 @@ class _OrdersConfirmScreenState extends State<OrdersConfirmScreen> {
     super.didChangeDependencies();
   }
 
-  Future<void> tryToMakeOrder() async {
+  Future<void> makeOrder() async {
     bool error = false;
-    if (_deliveryPlaceType == DeliveryPlaceType.customPlace) {
+    if (_formKeyDeliveryPlace.currentState != null) {
       if (_formKeyDeliveryPlace.currentState!.validate()) {
         _formKeyDeliveryPlace.currentState!.save();
       } else {
         error = true;
       }
     }
-    String paymentInf = "Payment upon receipt";
-    if (_paymentType == PaymentType.card) {
+    if (_formKeyCard.currentState != null) {
       if (_formKeyCard.currentState!.validate()) {
         _formKeyCard.currentState?.save();
-        paymentInf =
-            "Card: ${cardInformation?.cardNumber} Cvv: ${cardInformation?.cvvCode} ExpDate: ${cardInformation?.expdate} CardNameHolder: ${cardInformation?.cardNameHolder}";
       } else {
         error = true;
       }
     }
-    if (error) return;
-
-    // if (customArrivePlace) {
-    //   if (_formKeyDeliveryPlace.currentState!.validate()) {
-    //     _formKeyDeliveryPlace.currentState!.save();
-    //     setState(() {
-    //       customArrivePlaceHasError = false;
-    //     });
-    //   } else {
-    //     setState(() {
-    //       customArrivePlaceHasError = true;
-    //     });
-    //     error = true;
-    //   }
-    // } else {
-    //   deliveryArrivePlace = userInformation!.adress;
-    // }
-    // String paymentInf = "Payment upon receipt";
-    // if (paymentType == 2) {
-    //   if (_formKeyCard.currentState!.validate()) {
-    //     _formKeyCard.currentState?.save();
-    //     paymentInf =
-    //         "Card: ${cardInformation?.cardNumber} Cvv: ${cardInformation?.cvvCode} ExpDate: ${cardInformation?.expdate} CardNameHolder: ${cardInformation?.cardNameHolder}";
-    //   } else {
-    //     error = true;
-    //   }
-    // }
-    // if (error) return;
-
-    setState(() {
+    if (error) {
+      return;
+    }
+        setState(() {
       orderingProcess = true;
     });
-    try {
+        try {
       context.read<OrdersBloc>().add(AddOrder(
             cartProducts: cartItemInf["cartItems"],
             totalPrice: cartItemInf["totalPrice"],
             arrivePlace: deliveryArrivePlace,
-            payment: paymentInf,
+            payment: paymentInfo,
           ));
       final bloc = context.read<OrdersBloc>().stream.first;
       context.read<CartBloc>().add(ClearCart());
@@ -148,6 +107,7 @@ class _OrdersConfirmScreenState extends State<OrdersConfirmScreen> {
         }
       });
     } catch (err) {
+      // ignore: use_build_context_synchronously
       showDialog(
         context: context,
         builder: (_) => const AlertDialogTextWithPic(
@@ -164,168 +124,73 @@ class _OrdersConfirmScreenState extends State<OrdersConfirmScreen> {
   @override
   Widget build(BuildContext context) {
     return !isLoading
-        ? GestureDetector(
-            onTap: () {
-              FocusScope.of(context).unfocus();
+        ? WillPopScope(
+            onWillPop: () async {
+              return await showExitDialog(context).then((value) {
+                if (value == null) {
+                  return false;
+                } else {
+                  return value;
+                }
+              });
             },
-            child: WillPopScope(
-              onWillPop: () async {
-                return await showExitDialog(context).then((value) {
-                  if (value == null) {
-                    return false;
-                  } else {
-                    return value;
-                  }
-                });
-              },
-              child: Scaffold(
-                appBar: customAppBar(context),
-                body: ScrollConfiguration(
-                  behavior: CustomScrollBehavior(),
-                  child: SingleChildScrollView(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: getProportionateScreenWidth(20)),
-                      child: Column(
-                        children: [
-                          deliveryAdressCard(context),
-                          paymentMethodCard(context),
-                          SizedBox(
-                            height: getProportionateScreenWidth(20),
-                          )
-                          // const Spacer(),
-                        ],
+            child: Scaffold(
+              appBar: appBar(context),
+              body: SingleChildScrollView(
+                child: RPadding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    children: [
+                      DeliveryAdressCard(
+                          userInformation: userInformation!,
+                          updateAdress: (adress) {
+                            setState(() {
+                              deliveryArrivePlace = adress;
+                            });
+                          },
+                          formKey: _formKeyDeliveryPlace),
+                      PaymentCard(
+                        updatePaymentInfo: (paymentInfo) {
+                          setState(() {
+                            paymentInfo = paymentInfo;
+                          });
+                        },
+                        formKey: _formKeyCard,
                       ),
-                    ),
+                      SizedBox(
+                        height: 20.w,
+                      )
+                      // const Spacer(),
+                    ],
                   ),
                 ),
-                bottomNavigationBar: Padding(
-                  padding: EdgeInsets.all(getProportionateScreenWidth(20)),
-                  child: !orderingProcess
-                      ? DefaultButton(
-                          text: "Make order",
-                          press: () async {
-                            await tryToMakeOrder();
-                          })
-                      : Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                              CircularProgressIndicator(color: kPrimaryColor)
-                            ]),
-                ),
+              ),
+              bottomNavigationBar: RPadding(
+                padding: const EdgeInsets.all(20),
+                child: !orderingProcess
+                    ? DefaultButton(
+                        text: "Make order",
+                        press: () async {
+                          await makeOrder();
+                        })
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CircularProgressIndicator(
+                            color: Theme.of(context).colorScheme.primary,
+                          )
+                        ],
+                      ),
               ),
             ),
           )
         : const LoadingScreen();
   }
-
-  ShadowBloc paymentMethodCard(BuildContext context) {
-    return ShadowBloc(
-      widget: Column(
-        children: [
-          Text(
-            "Payment method",
-            style: Theme.of(context).textTheme.headline6,
-          ),
-          RadioListTile(
-            value: PaymentType.cash,
-            title: const Text("Payment upon receipt"),
-            groupValue: _paymentType,
-            onChanged: (value) {
-              setState(() {
-                _paymentType = value as PaymentType;
-              });
-            },
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            activeColor: kPrimaryColor,
-          ),
-          RadioListTile(
-            value: PaymentType.card,
-            title: const Text("By Card"),
-            groupValue: _paymentType,
-            onChanged: (value) {
-              setState(() {
-                _paymentType = value as PaymentType;
-              });
-            },
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            activeColor: kPrimaryColor,
-          ),
-          if (_paymentType == PaymentType.card)
-            CardInputFields(
-              formKey: _formKeyCard,
-              updateCardNum: (newValue) {
-                cardInformation?.cardNumber = newValue;
-              },
-              updateCardNameHolder: (newValue) {
-                cardInformation?.cardNameHolder = newValue;
-              },
-              updateExpdate: (newValue) {
-                cardInformation?.expdate = newValue;
-              },
-              updateCVV: (newValue) {
-                cardInformation?.cvvCode = newValue;
-              },
-            ),
-        ],
-      ),
-    );
-  }
-
-  ShadowBloc deliveryAdressCard(BuildContext context) {
-    return ShadowBloc(
-      widget: Column(
-        children: [
-          Text(
-            "Delivery Adress",
-            style: Theme.of(context).textTheme.headline6,
-          ),
-          RadioListTile(
-            value: DeliveryPlaceType.defaultPlace,
-            title: const Text("Standart Place"),
-            subtitle: Text(userInformation!.adress),
-            groupValue: _deliveryPlaceType,
-            onChanged: (value) {
-              setState(() {
-                _deliveryPlaceType = value as DeliveryPlaceType;
-              });
-            },
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            activeColor: kPrimaryColor,
-          ),
-          RadioListTile(
-            value: DeliveryPlaceType.customPlace,
-            title: const Text("Custom"),
-            groupValue: _deliveryPlaceType,
-            onChanged: (value) {
-              setState(() {
-                _deliveryPlaceType = value as DeliveryPlaceType;
-              });
-            },
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            activeColor: kPrimaryColor,
-          ),
-          if (_deliveryPlaceType == DeliveryPlaceType.customPlace)
-            CustomArrivePlaceTextField(
-              formKeyArrivePlace: _formKeyDeliveryPlace,
-              deliveryArrivePlaceUpdate: (newValue) {
-                deliveryArrivePlace = newValue!;
-              },
-            ),
-        ],
-      ),
-    );
-  }
-
-  AppBar customAppBar(BuildContext context) {
+  AppBar appBar(BuildContext context) {
     return AppBar(
       leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios),
-          splashRadius: getProportionateScreenWidth(25),
+          splashRadius: 25.w,
           onPressed: () async {
             await showExitDialog(context).then((exitConfrim) {
               if (exitConfrim == null || !exitConfrim) {
@@ -338,11 +203,13 @@ class _OrdersConfirmScreenState extends State<OrdersConfirmScreen> {
       title: Text(
         'Orders Confirm',
         style: TextStyle(
-          color: Colors.black,
-          fontSize: getProportionateScreenWidth(18),
+          color: Theme.of(context).colorScheme.onSurface,
+          fontSize: 18.sp,
         ),
       ),
       titleSpacing: 0,
     );
   }
 }
+
+

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../constants.dart';
-import '../../../../size_config.dart';
-import '../../../../widgets/DefaultButton.dart';
+import '../../../../widgets/default_button.dart';
 import '../products_order_settings_bloc/products_order_settings_bloc.dart';
 
 class SortingDrawer extends StatefulWidget {
@@ -16,7 +16,8 @@ class SortingDrawer extends StatefulWidget {
 }
 
 class _SortingDrawerState extends State<SortingDrawer> {
-  late SortType sortType;
+  late SortType sortType =
+      context.read<ProductsOrderSettingsBloc>().state.sortFilter;
   final List<String> sortNames = [
     "Sort by low price!",
     "Sort by high price!",
@@ -25,26 +26,18 @@ class _SortingDrawerState extends State<SortingDrawer> {
   ];
 
   @override
-  void initState() {
-    sortType = context.read<ProductsOrderSettingsBloc>().state.sortFilter;
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Drawer(
-        backgroundColor: const Color(0xfff5f6f9),
+        backgroundColor: Theme.of(context).colorScheme.background,
         child: Column(
           children: [
-            Padding(
-              padding: EdgeInsets.symmetric(
-                  vertical: getProportionateScreenWidth(20)),
+            RPadding(
+              padding: const EdgeInsets.symmetric(vertical: 20),
               child: Text(
-                'Sort products by...',
+                'Sort products by..',
                 style: TextStyle(
-                  color: Colors.black,
-                  fontSize: getProportionateScreenWidth(18),
+                  fontSize: 17.sp,
                 ),
               ),
             ),
@@ -54,13 +47,12 @@ class _SortingDrawerState extends State<SortingDrawer> {
                 children: [
                   ...List.generate(
                     SortType.values.length,
-                    (index) => paddingContainer(
+                    (index) => choiceCard(
                       child: RadioListTile(
                         value: SortType.values[index],
                         title: Text(
                           sortNames[index],
-                          style: const TextStyle(
-                              color: Colors.black, fontSize: 16),
+                          style: TextStyle(fontSize: 15.sp),
                         ),
                         groupValue: sortType,
                         onChanged: (value) {
@@ -69,7 +61,7 @@ class _SortingDrawerState extends State<SortingDrawer> {
                           });
                         },
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20)),
+                            borderRadius: BorderRadius.circular(20).r),
                         activeColor: kPrimaryColor,
                       ),
                     ),
@@ -77,10 +69,10 @@ class _SortingDrawerState extends State<SortingDrawer> {
                 ],
               ),
             ),
-            Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: getProportionateScreenWidth(30),
-                vertical: getProportionateScreenWidth(15),
+            RPadding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 30,
+                vertical: 15,
               ),
               child: DefaultButton(
                 text: "Apply",
@@ -97,19 +89,20 @@ class _SortingDrawerState extends State<SortingDrawer> {
       ),
     );
   }
-}
 
-Container paddingContainer({required Widget child}) {
-  return Container(
-    margin: EdgeInsets.only(
-      left: getProportionateScreenWidth(20),
-      right: getProportionateScreenWidth(20),
-      bottom: getProportionateScreenWidth(20),
-    ),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(20),
-    ),
-    child: child,
-  );
+  Container choiceCard({required Widget child}) {
+    return Container(
+      margin: const EdgeInsets.only(
+        left: 20,
+        right: 20,
+        bottom: 20,
+      ).r,
+      decoration: BoxDecoration(
+        // color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(20).r,
+      ),
+      child: child,
+    );
+  }
 }

@@ -1,56 +1,63 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import 'size_config.dart';
+const Color kPrimaryColor = Color(0xFFFF7643);
+const Color kgeneralTextColor = Color(0xFFA7A6A6);
 
-const kPrimaryColor = Color(0xFFFF7643);
-const kPrimaryLightColor = Color(0xFFFFECDF);
-const kPrimaryGradientColor = LinearGradient(
-  begin: Alignment.topLeft,
-  end: Alignment.bottomRight,
-  colors: [Color(0xFFFFA53E), Color(0xFFFF7643)],
-);
+const Color kbackgroundColorDark = Color(0xFF252525);
+const Color ksurfaceColorDark = Color(0xFF3B3B3B);
+
+const Color ksurfaceColorLight = Color(0xFFEBEBEB);
+
 const kSecondaryColor = Color(0xFF979797);
-const kTextColor = Color(0xFF757575);
 
-const kAnimationDuration = Duration(milliseconds: 200);
+const Color kBorderColor = Color(0xFF757575);
 
-final headingStyle = TextStyle(
-  fontSize: getProportionateScreenWidth(28),
-  fontWeight: FontWeight.bold,
-  color: Colors.black,
-  height: 1.5,
-);
+const kAnimationDuration = Duration(milliseconds: 250);
 
-const defaultDuration = Duration(milliseconds: 250);
+InputDecoration get roundInputDecoration {
+  OutlineInputBorder outlineInputBorder = OutlineInputBorder(
+    borderRadius: BorderRadius.circular(28).r,
+    borderSide: const BorderSide(color: kBorderColor),
+    gapPadding: 10,
+  );
+  return InputDecoration(
+      floatingLabelBehavior: FloatingLabelBehavior.auto,
+      contentPadding:
+          const EdgeInsets.symmetric(horizontal: 30, vertical: 20).r,
+      enabledBorder: outlineInputBorder,
+      focusedBorder: outlineInputBorder,
+      border: outlineInputBorder);
+}
+
+BoxShadow themedBoxShadow(Brightness brightness) {
+  if (brightness == Brightness.light) {
+    return const BoxShadow(
+      color: Color(0x87000000),
+      blurRadius: 3,
+      spreadRadius: 0,
+    );
+  } else {
+    return BoxShadow(
+      color: Colors.white.withOpacity(0.7),
+      blurRadius: 3,
+      spreadRadius: 0,
+    );
+  }
+}
 
 // Form Error
 final RegExp emailValidatorRegExp =
     RegExp(r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
 final RegExp phoneValidatorRegExp = RegExp(r'^(?:[+0][1-9])?[0-9]{10,13}$');
-const String kEmailNullError = "Please Enter your email";
-const String kInvalidEmailError = "Please Enter valid Email";
-const String kPassNullError = "Please Enter your password";
+const String kEmailEmptyError = "Please enter your email";
+const String kInvalidEmailError = "Please enter valid email";
+const String kPassNullError = "Please enter your password";
 const String kShortPassError = "Password is too short";
 const String kMatchPassError = "Passwords don't match";
-const String kNamelNullError = "Please Enter your name";
-const String kPhoneNumberNullError = "Please Enter your phone number";
-// const String kPhoneNumberLenghError = "Please Enter full phone number";
-const String kInvalidPhoneNumberError = "Please Enter valid phone number";
-const String kAddressNullError = "Please Enter your address";
-
-final otpInputDecoration = InputDecoration(
-  contentPadding:
-      EdgeInsets.symmetric(vertical: getProportionateScreenWidth(15)),
-  border: outlineInputBorder(),
-  focusedBorder: outlineInputBorder(),
-  enabledBorder: outlineInputBorder(),
-);
-
-OutlineInputBorder outlineInputBorder() {
-  return OutlineInputBorder(
-    borderRadius: BorderRadius.circular(getProportionateScreenWidth(15)),
-    borderSide: const BorderSide(color: kTextColor),
-  );
-}
+const String kNamelNullError = "Please enter your name";
+const String kPhoneNumberNullError = "Please enter your phone number";
+const String kInvalidPhoneNumberError = "Please enter valid phone number";
+const String kAddressNullError = "Please enter your address";
 
 const cartNotificationKey = "cart_notifications";

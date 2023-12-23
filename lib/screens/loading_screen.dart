@@ -1,13 +1,11 @@
-import 'package:e_commerce/constants.dart';
-import 'package:e_commerce/size_config.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class LoadingScreen extends StatelessWidget {
   const LoadingScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    SizeConfig().init(context);
     return Scaffold(
       body: SizedBox(
         width: double.infinity,
@@ -15,11 +13,12 @@ class LoadingScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const CircularProgressIndicator(color: kPrimaryColor),
-            SizedBox(height: getProportionateScreenWidth(10)),
+            CircularProgressIndicator(
+                color: Theme.of(context).colorScheme.primary),
+            SizedBox(height: 8.w),
             Text(
               'Loading...',
-              style: Theme.of(context).textTheme.headline5,
+              style: TextStyle(fontSize: 18.sp),
             ),
           ],
         ),
