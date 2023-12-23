@@ -62,7 +62,9 @@ class CartBloc extends Bloc<CartEvent, CartState> {
         items: state.items,
       );
       await cancelNotificationsByChannelKey(cartNotificationKey);
-      await createCartNotification(newItems.length);
+      if (newItems.length > 1) {
+        await createCartNotification(newItems.length);
+      }
       emit(state.copyWith(items: newItems, error: null));
     } catch (err) {
       emit(state.copyWith(error: err.toString()));

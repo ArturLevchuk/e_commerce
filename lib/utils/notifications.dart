@@ -16,7 +16,6 @@ Future<void> createCartNotification(int itemsCount) async {
       body: "There are $itemsCount items in your cart. Don't wait, order!",
       category: NotificationCategory.Recommendation,
     ),
-    // schedule: NotificationInterval(interval: 60),
     schedule: NotificationInterval(interval: 60, repeats: false),
   );
 }
