@@ -20,7 +20,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: '>=2.18.0 <3.0.0'
+  sdk: '>=3.0.0 <4.0.0'
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -33,13 +33,13 @@ dependencies:
   cupertino_icons: ^1.0.2
   custom_refresh_indicator: ^2.0.1
   dio: ^4.0.6
-  equatable: ^2.0.5
   flutter:
     sdk: flutter
-  flutter_bloc: ^8.1.2
+  flutter_modular: ^6.3.2
   flutter_screenutil: ^5.9.0
   flutter_svg: ^0.22.0
   intl: ^0.17.0
+  rxdart: ^0.27.7
   shared_preferences: ^2.0.15
 
 dev_dependencies:

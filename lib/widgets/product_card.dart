@@ -1,9 +1,11 @@
-import 'package:e_commerce/repositories/models/product.dart';
+import '/modules/authorization/screens/widgets/errors_show.dart';
+import '/modules/core_modules/auth_module/vm/auth_controller.dart';
+import '/modules/shop_module/core_buisness_logic/products/vm/products_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_modular/flutter_modular.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../apis/models/product.dart';
 import '../constants.dart';
-import '../screens/main_app/home/products_bloc/products_bloc.dart';
 import 'animated_fav_button.dart';
 
 class ProductCard extends StatelessWidget {
@@ -23,7 +25,9 @@ class ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Product product = context.read<ProductsBloc>().state.prodById(productId);
+    final ProductsController productsController =
+        Modular.get<ProductsController>();
+    final Product product = productsController.state.prodById(productId);
     return RPadding(
       padding:
           leftPadding ? const EdgeInsets.only(left: 20).r : EdgeInsets.zero,
@@ -77,10 +81,10 @@ class ProductCard extends StatelessWidget {
                           color: Theme.of(context).colorScheme.primary,
                         ),
                         children: [
-                          if (product.prev_price > 0 &&
-                              product.prev_price > product.price)
+                          if (product.prevPrice > 0 &&
+                              product.prevPrice > product.price)
                             TextSpan(
-                              text: "\$${product.prev_price}",
+                              text: "\$${product.prevPrice}",
                               style: TextStyle(
                                 fontSize: 11.sp,
                                 color: kgeneralTextColor,
@@ -90,18 +94,31 @@ class ProductCard extends StatelessWidget {
                         ],
                       ),
                     ),
-                    BlocSelector<ProductsBloc, ProductsState, bool>(
-                      selector: (state) {
-                        return state.favById(productId);
-                      },
-                      builder: (context, state) {
+                    StreamBuilder<ProductsState>(
+                      stream: productsController.stream,
+                      builder: (context, snap) {
                         return AnimatedFavRoundButton(
-                          onTap: () {
-                            context
-                                .read<ProductsBloc>()
-                                .add(ToggleFav(productId));
+                          onTap: () async {
+                            final AuthController authController =
+                                context.read<AuthController>();
+                            final String userId = authController.state.id;
+                            final String authToken = authController.state.token;
+                            try {
+                              await productsController.changeFavoriteStatus(
+                                productid: productId,
+                                userId: userId,
+                                authToken: authToken,
+                              );
+                            } catch (err) {
+                              // ignore: use_build_context_synchronously
+                              showErrorDialog(
+                                  context: context, err: err.toString());
+                            }
+                            // context
+                            //     .read<ProductsBloc>()
+                            //     .add(ToggleFav(productId));
                           },
-                          active: state,
+                          active: productsController.state.favById(productId),
                         );
                       },
                     )

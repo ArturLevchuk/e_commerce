@@ -1,9 +1,8 @@
 import 'dart:developer';
 import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:e_commerce/screens/main_app/cart/cart_screen.dart';
-import 'package:e_commerce/utils/offline_auth_check.dart';
+// import '/screens/main_app/cart/cart_screen.dart';
+import '/utils/offline_auth_check.dart';
 import '../constants.dart';
-import '../screens/app/app.dart';
 
 class NotificationController {
   /// Use this method to detect when a new notification or a schedule is created
@@ -47,9 +46,9 @@ class NotificationController {
   @pragma("vm:entry-point")
   static Future<void> onActionReceivedMethod(
       ReceivedAction receivedAction) async {
-    AwesomeNotifications().cancelNotificationsByChannelKey(cartNotificationKey);
-    if (receivedAction.channelKey == cartNotificationKey) {
-      App.navigatorKey.currentState?.pushReplacementNamed('/');
-    }
+    // AwesomeNotifications().cancelNotificationsByChannelKey(cartNotificationKey);
+    // if (receivedAction.channelKey == cartNotificationKey) {
+    //   App.navigatorKey.currentState?.pushReplacementNamed('/');
+    // }
   }
 }

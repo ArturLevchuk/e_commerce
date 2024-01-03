@@ -7,7 +7,7 @@ const Color kgeneralTextColor = Color(0xFFA7A6A6);
 const Color kbackgroundColorDark = Color(0xFF252525);
 const Color ksurfaceColorDark = Color(0xFF3B3B3B);
 
-const Color ksurfaceColorLight = Color(0xFFEBEBEB);
+const Color ksurfaceColorLight = Color(0xFFF2F2F2);
 
 const kSecondaryColor = Color(0xFF979797);
 
@@ -61,3 +61,7 @@ const String kInvalidPhoneNumberError = "Please enter valid phone number";
 const String kAddressNullError = "Please enter your address";
 
 const cartNotificationKey = "cart_notifications";
+const generalNotificationKey = "general_notifications";
+
+const String userDataKey = "userData";
+const String appSettingsKey = "appSettings";

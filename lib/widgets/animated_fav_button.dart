@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import '../constants.dart';
-import '../size_config.dart';
 
 class AnimatedFavRoundButton extends StatefulWidget {
   const AnimatedFavRoundButton({

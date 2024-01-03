@@ -9,7 +9,6 @@ ThemeData get lightTheme => ThemeData(
       useMaterial3: true,
       colorScheme: const ColorScheme.light(
         primary: kPrimaryColor,
-        // background: kbackgroundColorDark,
         surface: ksurfaceColorLight,
       ),
       fontFamily: "Muli",
@@ -80,7 +79,3 @@ ThemeData get darkTheme => ThemeData(
       visualDensity: VisualDensity.adaptivePlatformDensity,
     );
 
-ThemeData theme() {
-  // return lightTheme;
-  return darkTheme;
-}

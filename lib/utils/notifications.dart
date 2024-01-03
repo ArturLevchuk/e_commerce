@@ -1,9 +1,6 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:e_commerce/constants.dart';
-
-int createUniqueId() {
-  return DateTime.now().millisecondsSinceEpoch.remainder(100000);
-}
+import '/constants.dart';
+import '/utils/uniq_id.dart';
 
 Future<void> createCartNotification(int itemsCount) async {
   await AwesomeNotifications()

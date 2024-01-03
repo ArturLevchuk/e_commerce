@@ -1,27 +1,24 @@
-import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:e_commerce/utils/custom_blocobserver.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'constants.dart';
+import 'dart:async';
+import 'dart:developer';
+import '/services/abstracts/notification_service.dart';
+import '/services/aw_notification_service.dart';
+import 'package:flutter_modular/flutter_modular.dart';
 import 'package:flutter/material.dart';
-import 'screens/app/app.dart';
+import 'modules/main_module.dart';
+import 'app.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  Bloc.observer = CustomBlocObserver();
-  await AwesomeNotifications().initialize(
-    'resource://drawable/ic_launcher',
-    [
-      NotificationChannel(
-        channelKey: cartNotificationKey,
-        channelName: "Cart Notifications",
-        channelDescription: "Notifications about total amount of items in cart",
-        importance: NotificationImportance.High,
-        channelShowBadge: true,
-        defaultColor: kPrimaryColor,
-        ledColor: kPrimaryColor,
+  runZonedGuarded(() {
+    WidgetsFlutterBinding.ensureInitialized();
+    final NotificationService notificationService = AWNotificationService();
+    notificationService.init();
+    runApp(
+      ModularApp(
+        module: MainModule(),
+        child: const App(),
       ),
-    ],
-  );
-
-  runApp(const App());
+    );
+  }, (error, stack) {
+    log("", error: error, stackTrace: stack);
+  });
 }
