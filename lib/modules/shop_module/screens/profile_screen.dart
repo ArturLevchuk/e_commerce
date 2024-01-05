@@ -1,3 +1,5 @@
+import 'package:e_commerce/modules/shop_module/screens/settings_screen/settings_screen.dart';
+
 import '/modules/core_modules/auth_module/vm/auth_controller.dart';
 import '/modules/shop_module/screens/orders/orders_screen.dart';
 import 'package:flutter_modular/flutter_modular.dart';
@@ -67,7 +69,9 @@ class ProfileMenuList extends StatelessWidget {
           ProfileMenuItem(
             text: "Settings",
             icon: "assets/icons/Settings.svg",
-            press: () {},
+            press: () {
+              Modular.to.pushNamed(".${SettingsScreen.routeName}");
+            },
           ),
           ProfileMenuItem(
             text: "Help Center",

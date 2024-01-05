@@ -14,14 +14,26 @@ class AppSettings {
 
   Map<String, dynamic> toMap() {
     return {
-      'themeMode': themeMode,
+      'themeMode': themeMode.name,
     };
   }
 
   factory AppSettings.fromMap(Map<String, dynamic> map) {
+    ThemeMode strToThemeMode(String name) {
+      switch (name) {
+        case 'system':
+          return ThemeMode.system;
+        case 'light':
+          return ThemeMode.light;
+        case 'dark':
+          return ThemeMode.dark;
+        default:
+          return ThemeMode.system;
+      }
+    }
+
     return AppSettings(
-      themeMode: map['themeMode'] as ThemeMode,
+      themeMode: strToThemeMode(map['themeMode']),
     );
   }
-
 }

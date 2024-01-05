@@ -1,3 +1,5 @@
+import 'package:e_commerce/modules/shop_module/screens/settings_screen/settings_screen.dart';
+
 import '/apis/abstract/cart_api.dart';
 import '/apis/abstract/orders_api.dart';
 import '/apis/abstract/products_api.dart';
@@ -83,6 +85,10 @@ class ShopModule extends Module {
     r.child(
       UserInformationEditScreen.routeName,
       child: (context) => const UserInformationEditScreen(),
+    );
+    r.child(
+      SettingsScreen.routeName,
+      child: (context) => const SettingsScreen(),
     );
   }
 }
