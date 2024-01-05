@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:dio/dio.dart';
+import '../utils/connection_exception.dart';
 import '/apis/models/cart_item.dart';
 
 import '/apis/models/order_item.dart';
@@ -47,8 +49,16 @@ class FirebaseOrdersApi implements OrdersApi {
         ),
       );
       return response.data['name'];
+    } on DioError catch (err) {
+      if (err.error is SocketException) {
+        throw ConnectionException();
+      } else if (err.type == DioErrorType.response) {
+        throw ServerException();
+      } else {
+        rethrow;
+      }
     } catch (err) {
-      throw ServerException();
+      rethrow;
     }
   }
 
@@ -62,8 +72,16 @@ class FirebaseOrdersApi implements OrdersApi {
       final url = Uri.parse(
           "$webDatabaseUrl/orders/$userId/$orderId.json?auth=$authToken");
       await dioClient.deleteUri(url);
+    } on DioError catch (err) {
+      if (err.error is SocketException) {
+        throw ConnectionException();
+      } else if (err.type == DioErrorType.response) {
+        throw ServerException();
+      } else {
+        rethrow;
+      }
     } catch (err) {
-      throw ServerException();
+      rethrow;
     }
   }
 
@@ -101,9 +119,16 @@ class FirebaseOrdersApi implements OrdersApi {
         ));
       });
       return loadedOrders;
+    } on DioError catch (err) {
+      if (err.error is SocketException) {
+        throw ConnectionException();
+      } else if (err.type == DioErrorType.response) {
+        throw ServerException();
+      } else {
+        rethrow;
+      }
     } catch (err) {
       rethrow;
-      // throw ServerException();
     }
   }
 }

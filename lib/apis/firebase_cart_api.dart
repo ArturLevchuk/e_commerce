@@ -1,7 +1,8 @@
-import 'dart:developer';
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:dio/dio.dart';
+import '../utils/connection_exception.dart';
 import '../utils/server_exception.dart';
 import '/apis/abstract/cart_api.dart';
 import 'models/cart_item.dart';
@@ -33,9 +34,16 @@ class FirebaseCartApi implements CartApi {
         );
       });
       return loadedCartItems;
+    } on DioError catch (err) {
+      if (err.error is SocketException) {
+        throw ConnectionException();
+      } else if (err.type == DioErrorType.response) {
+        throw ServerException();
+      } else {
+        rethrow;
+      }
     } catch (err) {
-      log(err.toString());
-      throw ServerException();
+      rethrow;
     }
   }
 
@@ -56,9 +64,16 @@ class FirebaseCartApi implements CartApi {
         'color': color.value,
       });
       return response.data['name'];
+    } on DioError catch (err) {
+      if (err.error is SocketException) {
+        throw ConnectionException();
+      } else if (err.type == DioErrorType.response) {
+        throw ServerException();
+      } else {
+        rethrow;
+      }
     } catch (err) {
-      log(err.toString());
-      throw ServerException();
+      rethrow;
     }
   }
 
@@ -75,9 +90,16 @@ class FirebaseCartApi implements CartApi {
       await dioClient.patchUri(url, data: {
         'numOfItem': numOfItem,
       });
+    } on DioError catch (err) {
+      if (err.error is SocketException) {
+        throw ConnectionException();
+      } else if (err.type == DioErrorType.response) {
+        throw ServerException();
+      } else {
+        rethrow;
+      }
     } catch (err) {
-      log(err.toString());
-      throw ServerException();
+      rethrow;
     }
   }
 
@@ -91,9 +113,16 @@ class FirebaseCartApi implements CartApi {
       final url = Uri.parse(
           "$webDatabaseUrl/cart/$userId/$cartId.json?auth=$authToken");
       await dioClient.deleteUri(url);
+    } on DioError catch (err) {
+      if (err.error is SocketException) {
+        throw ConnectionException();
+      } else if (err.type == DioErrorType.response) {
+        throw ServerException();
+      } else {
+        rethrow;
+      }
     } catch (err) {
-      log(err.toString());
-      throw ServerException();
+      rethrow;
     }
   }
 
@@ -104,9 +133,16 @@ class FirebaseCartApi implements CartApi {
       final url =
           Uri.parse("$webDatabaseUrl/cart/$userId.json?auth=$authToken");
       await dioClient.deleteUri(url);
+    } on DioError catch (err) {
+      if (err.error is SocketException) {
+        throw ConnectionException();
+      } else if (err.type == DioErrorType.response) {
+        throw ServerException();
+      } else {
+        rethrow;
+      }
     } catch (err) {
-      log(err.toString());
-      throw ServerException();
+      rethrow;
     }
   }
 }

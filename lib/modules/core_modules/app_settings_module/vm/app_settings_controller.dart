@@ -18,9 +18,13 @@ class AppSettingsController extends Disposable {
   AppSettings get state => _streamController.value;
 
   Future<void> init() async {
-    final mapOfSettings = await _localStorageService.get(key: appSettingsKey);
-    if (mapOfSettings.isNotEmpty) {
-      _streamController.add(AppSettings.fromMap(mapOfSettings));
+    try {
+      final mapOfSettings = await _localStorageService.get(key: appSettingsKey);
+      if (mapOfSettings.isNotEmpty) {
+        _streamController.add(AppSettings.fromMap(mapOfSettings));
+      }
+    } catch (err) {
+      rethrow;
     }
   }
 

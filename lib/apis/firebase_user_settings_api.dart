@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:dio/dio.dart';
 
+import '../utils/connection_exception.dart';
 import '../utils/server_exception.dart';
 import 'models/user_information.dart';
 import 'abstract/user_settings_api.dart';
@@ -25,9 +27,17 @@ class FirebaseUserSettingsApi implements UserSettingsApi {
         name: extractedData['name'],
         phoneNumber: extractedData['phoneNumber'],
       );
+    } on DioError catch (err) {
+      if (err.error is SocketException) {
+        throw ConnectionException();
+      } else if (err.type == DioErrorType.response) {
+        throw ServerException();
+      } else {
+        rethrow;
+      }
     } catch (err) {
-      throw ServerException();
-    } 
+      rethrow;
+    }
   }
 
   @override
@@ -44,8 +54,16 @@ class FirebaseUserSettingsApi implements UserSettingsApi {
             "name": userInformation.name,
             "phoneNumber": userInformation.phoneNumber,
           }));
+    } on DioError catch (err) {
+      if (err.error is SocketException) {
+        throw ConnectionException();
+      } else if (err.type == DioErrorType.response) {
+        throw ServerException();
+      } else {
+        rethrow;
+      }
     } catch (err) {
-      throw ServerException();
-    } 
+      rethrow;
+    }
   }
 }

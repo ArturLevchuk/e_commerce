@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -17,16 +16,17 @@ class App extends StatelessWidget {
         context.read<AppSettingsController>();
     appSettingsController.init();
     return StreamBuilder<AppSettings>(
-        stream: appSettingsController.stream,
-        builder: (context, snapshot) {
-          return MaterialApp.router(
-            title: 'Flutter E-commerce',
-            debugShowCheckedModeBanner: false,
-            darkTheme: darkTheme,
-            theme: lightTheme,
-            themeMode: appSettingsController.state.themeMode,
-            routerConfig: Modular.routerConfig,
-          );
-        });
+      stream: appSettingsController.stream,
+      builder: (context, snapshot) {
+        return MaterialApp.router(
+          title: 'Flutter E-commerce',
+          debugShowCheckedModeBanner: false,
+          darkTheme: darkTheme,
+          theme: lightTheme,
+          themeMode: appSettingsController.state.themeMode,
+          routerConfig: Modular.routerConfig,
+        );
+      },
+    );
   }
 }

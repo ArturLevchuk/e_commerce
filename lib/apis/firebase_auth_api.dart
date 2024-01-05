@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:e_commerce/utils/connection_exception.dart';
 import '/utils/server_exception.dart';
 
 import 'abstract/auth_api.dart';
@@ -37,10 +39,8 @@ class FirebaseAuthApi implements AuthApi {
         responseData['expiresIn'],
       )));
       return (token: token, userId: userId, expiryDate: expiryDate);
-    } on DioError catch (err) {
-      throw AuthException(err.response?.data['error']['message']);
     } catch (err) {
-      throw ServerException();
+      rethrow;
     }
   }
 
@@ -58,8 +58,16 @@ class FirebaseAuthApi implements AuthApi {
         userId: authenticateRes.userId,
         expiryDate: authenticateRes.expiryDate,
       );
+    } on DioError catch (err) {
+      if (err.error is SocketException) {
+        throw ConnectionException();
+      } else if (err.type == DioErrorType.response) {
+        throw ServerException();
+      } else {
+        throw AuthException(err.response?.data['error']['message']);
+      }
     } catch (err) {
-      throw ServerException();
+      rethrow;
     }
   }
 
@@ -92,9 +100,15 @@ class FirebaseAuthApi implements AuthApi {
         expiryDate: authenticateRes.expiryDate
       );
     } on DioError catch (err) {
-      throw AuthException(err.response?.data['error']['message']);
+      if (err.error is SocketException) {
+        throw ConnectionException();
+      } else if (err.type == DioErrorType.response) {
+        throw ServerException();
+      } else {
+        throw AuthException(err.response?.data['error']['message']);
+      }
     } catch (err) {
-      throw ServerException();
+      rethrow;
     }
   }
 }

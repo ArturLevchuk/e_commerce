@@ -1,8 +1,9 @@
 import 'dart:convert';
-import 'dart:developer';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
 
+import '../utils/connection_exception.dart';
 import '../utils/server_exception.dart';
 import 'models/product.dart';
 
@@ -42,9 +43,16 @@ class FirebaseProductsApi implements ProductsApi {
         );
       });
       return loadedProducts;
+    } on DioError catch (err) {
+      if (err.error is SocketException) {
+        throw ConnectionException();
+      } else if (err.type == DioErrorType.response) {
+        throw ServerException();
+      } else {
+        rethrow;
+      }
     } catch (err) {
-      log(err.toString());
-      throw ServerException();
+      rethrow;
     }
   }
 
@@ -59,9 +67,16 @@ class FirebaseProductsApi implements ProductsApi {
       final url = Uri.parse(
           '$webDatabaseUrl/userFavorites/$userId/$productid.json?auth=$authToken');
       await dioClient.putUri(url, data: json.encode(isFavorite));
+    } on DioError catch (err) {
+      if (err.error is SocketException) {
+        throw ConnectionException();
+      } else if (err.type == DioErrorType.response) {
+        throw ServerException();
+      } else {
+        rethrow;
+      }
     } catch (err) {
-      log(err.toString());
-      throw ServerException();
+      rethrow;
     }
   }
 }
