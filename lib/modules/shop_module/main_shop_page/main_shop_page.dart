@@ -8,7 +8,6 @@ import 'package:flutter_modular/flutter_modular.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../services/abstracts/notification_service.dart';
-import '../../../services/aw_notification_service.dart';
 import '../../core_modules/auth_module/vm/auth_controller.dart';
 import '../core_buisness_logic/products/vm/products_controller.dart';
 import '../screens/home_screen/home_screen.dart';
@@ -49,7 +48,7 @@ class MainShopPage extends StatelessWidget {
   }
 
   Future<void> notificationsPermissonsCheck(BuildContext context) async {
-    final NotificationService notificationService = AWNotificationService();
+    final NotificationService notificationService = context.read<NotificationService>();
     return notificationService.isNotificationAllowed().then((isAllowed) {
       if (!isAllowed) {
         showDialog(
