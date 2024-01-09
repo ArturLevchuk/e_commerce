@@ -1,6 +1,6 @@
 import 'dart:developer';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
 import '/constants.dart';
 import '/services/abstracts/notification_service.dart';
@@ -19,17 +19,27 @@ class CartController extends Disposable {
   final BehaviorSubject<CartState> _streamController =
       BehaviorSubject.seeded(const CartState());
 
-  Stream<CartState> get stream => _streamController.stream;
+  Stream<CartState> get stream => _streamController.stream.distinct(
+        (previous, current) =>
+            previous.cartLoadStatus == current.cartLoadStatus,
+      );
   CartState get state => _streamController.value;
 
-  Future<void> fetchAndSetCart(
-      {required String userId, required String authToken}) async {
+  Future<void> fetchAndSetCart({
+    required String userId,
+    required String authToken,
+    bool silentUpdate = false,
+  }) async {
     try {
-      _streamController.add(
-        state.copyWith(cartLoadStatus: CartLoadStatus.loading),
-      );
+      if (!silentUpdate) {
+        _streamController.add(
+          state.copyWith(cartLoadStatus: CartLoadStatus.loading),
+        );
+      }
+
       final cartItems =
           await _cartApi.fetchAndSetCart(userId: userId, authToken: authToken);
+
       _streamController.add(state.copyWith(
         items: cartItems,
         cartLoadStatus: CartLoadStatus.loaded,

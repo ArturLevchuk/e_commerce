@@ -16,11 +16,8 @@ class FavoriteProductItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        Modular.to.pushNamed(DetailsScreen.routeName, arguments: product.id);
-        // Navigator.of(context).push(
-        //   customSlidePageRouteBuilder(
-        //       moveTo: const DetailsScreen(), arguments: product.id),
-        // );
+        Modular.to
+            .pushNamed(".${DetailsScreen.routeName}", arguments: product.id);
       },
       child: RPadding(
         padding: const EdgeInsets.symmetric(

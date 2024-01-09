@@ -19,28 +19,19 @@ import '../orders/orders_confirm_screen/orders_confirm_screen.dart';
 part 'widgets/check_out_card.dart';
 part 'widgets/cart_item_card.dart';
 
-class CartScreen extends StatefulWidget {
+class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
   static const routeName = '/CartScreen';
 
-  @override
-  State<CartScreen> createState() => _CartScreenState();
-}
-
-class _CartScreenState extends State<CartScreen> {
-  bool refreshing = false;
-
   Future<void> _refresh(BuildContext context) async {
     try {
-      setState(() {
-        refreshing = true;
-      });
       final authController = context.read<AuthController>();
       final userId = authController.state.id;
       final authToken = authController.state.token;
       await context.read<CartController>().fetchAndSetCart(
             userId: userId,
             authToken: authToken,
+            silentUpdate: true,
           );
     } catch (err) {
       // ignore: use_build_context_synchronously
@@ -51,24 +42,18 @@ class _CartScreenState extends State<CartScreen> {
           await _refresh(context);
         },
       );
-    } finally {
-      setState(() {
-        refreshing = false;
-      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // final productListProv = context.read<ProductsBloc>();
     final productsController = context.read<ProductsController>();
     final cartController = context.read<CartController>();
     final authController = context.read<AuthController>();
     return StreamBuilder<CartState>(
       stream: cartController.stream,
       builder: (context, state) {
-        if (cartController.state.cartLoadStatus == CartLoadStatus.loaded ||
-            refreshing) {
+        if (cartController.state.cartLoadStatus == CartLoadStatus.loaded) {
           final cartList = cartController.state.items;
           return Scaffold(
             appBar: appBar(context),

@@ -1,7 +1,8 @@
 import 'dart:developer';
 
+import 'package:flutter/foundation.dart';
+
 import '/apis/abstract/products_api.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -16,19 +17,25 @@ class ProductsController extends Disposable {
   final BehaviorSubject<ProductsState> _streamController =
       BehaviorSubject.seeded(const ProductsState());
 
-  Stream<ProductsState> get stream => _streamController.stream;
+  Stream<ProductsState> get stream => _streamController.stream.distinct(
+    (previous, next) => previous == next,
+  );
   ProductsState get state => _streamController.value;
 
   Future<void> fetchAndSetProducts({
     required String userId,
     required String authToken,
+    bool silentUpdate = false,
   }) async {
     try {
-      _streamController.add(
-        state.copyWith(
-          productsLoadStatus: ProductsLoadStatus.loading,
-        ),
-      );
+      if (!silentUpdate) {
+        _streamController.add(
+          state.copyWith(
+            productsLoadStatus: ProductsLoadStatus.loading,
+          ),
+        );
+      }
+
       final products = await _productsApi.fetchAndSetProducts(
         userId: userId,
         authToken: authToken,

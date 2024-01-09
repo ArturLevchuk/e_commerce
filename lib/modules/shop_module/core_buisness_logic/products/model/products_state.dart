@@ -1,6 +1,8 @@
+// ignore_for_file: hash_and_equals
+
 part of '../vm/products_controller.dart';
 
-enum ProductsLoadStatus { initial, loading, loaded}
+enum ProductsLoadStatus { initial, loading, loaded }
 
 @immutable
 class ProductsState {
@@ -41,5 +43,12 @@ class ProductsState {
 
   double getPriceOfItem(String id) {
     return items.firstWhere((element) => element.id == id).price;
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is ProductsState &&
+        listEquals(items, other.items) &&
+        productsLoadStatus == other.productsLoadStatus;
   }
 }

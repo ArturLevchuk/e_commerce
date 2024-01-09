@@ -1,3 +1,5 @@
+// ignore_for_file: hash_and_equals
+
 import 'cart_item.dart';
 
 class OrderItem {
@@ -17,11 +19,17 @@ class OrderItem {
     required this.arrivePlace,
     final String? status,
     required this.dateTime,
-  }) : _payment = payment , status = status ?? "Order in processing...";
+  })  : _payment = payment,
+        status = status ?? "Order in processing...";
 
   String get payment {
     return _payment.contains("Payment upon receipt")
         ? "Payment upon receipt"
         : "Paid by card";
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is OrderItem && id == other.id;
   }
 }

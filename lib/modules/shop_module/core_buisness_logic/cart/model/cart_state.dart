@@ -1,3 +1,5 @@
+// ignore_for_file: hash_and_equals
+
 part of '../vm/cart_controller.dart';
 
 enum CartLoadStatus { initial, loading, loaded }
@@ -21,4 +23,10 @@ class CartState {
       cartLoadStatus: cartLoadStatus ?? this.cartLoadStatus,
     );
   }
+
+  @override
+  bool operator == (Object other) {
+    return other is CartState && mapEquals(items, other.items) && cartLoadStatus == other.cartLoadStatus;
+  }
+  
 }

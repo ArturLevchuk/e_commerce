@@ -1,6 +1,6 @@
 import 'dart:developer';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../../../../../apis/abstract/orders_api.dart';
@@ -15,17 +15,23 @@ class OrdersController {
 
   final BehaviorSubject<OrdersState> _streamController =
       BehaviorSubject.seeded(const OrdersState());
-  Stream<OrdersState> get stream => _streamController.stream;
+  Stream<OrdersState> get stream => _streamController.stream.distinct(
+    (previous, next) => previous == next,
+  );
   OrdersState get state => _streamController.value;
 
   Future<void> fetchAndSetOrders({
     required String userId,
     required String authToken,
+    bool silentUpdate = false,
   }) async {
     try {
-      _streamController.add(
-        state.copyWith(ordersLoadStatus: OrdersLoadStatus.loading),
-      );
+      if (!silentUpdate) {
+        _streamController.add(
+          state.copyWith(ordersLoadStatus: OrdersLoadStatus.loading),
+        );
+      }
+
       final ordersList = await _ordersApi.fetchAndSetOrders(
         userId: userId,
         authToken: authToken,
@@ -38,7 +44,8 @@ class OrdersController {
       );
     } catch (err) {
       log(err.toString());
-      _streamController.add(state.copyWith(ordersLoadStatus: OrdersLoadStatus.initial));
+      _streamController
+          .add(state.copyWith(ordersLoadStatus: OrdersLoadStatus.initial));
       rethrow;
     }
   }

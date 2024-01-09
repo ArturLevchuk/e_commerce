@@ -1,3 +1,5 @@
+// ignore_for_file: hash_and_equals
+
 import 'package:flutter/material.dart';
 
 class Product {
@@ -37,26 +39,6 @@ class Product {
     );
   }
 
-  // factory Product.fromJson(
-  //     String prodId, Map<String, dynamic> json, Map<String, dynamic>? favData) {
-  //   return Product(
-  //     id: prodId,
-  //     images: (json['images'] as List<dynamic>)
-  //         .map((str) => str.toString())
-  //         .toList(),
-  //     colors: (json['colors'] as List<dynamic>)
-  //         .map((color) => Color(int.parse(color)))
-  //         .toList(),
-  //     title: json['title'],
-  //     price: json['price'].toDouble(),
-  //     prevPrice: json['prevPrice']?.toDouble() ?? 0,
-  //     rating: json['rating'].toDouble(),
-  //     inStockCount: json['inStockCount'],
-  //     description: json['description'],
-  //     isFavorite: favData == null ? false : favData[prodId] ?? false,
-  //   );
-  // }
-
   factory Product.fromData({
     required String id,
     required Map<String, dynamic> data,
@@ -76,5 +58,10 @@ class Product {
       description: data['description'],
       isFavorite: isFavorite,
     );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is Product && id == other.id && isFavorite == other.isFavorite;
   }
 }
