@@ -55,157 +55,159 @@ class CartScreen extends StatelessWidget {
       builder: (context, state) {
         if (cartController.state.cartLoadStatus == CartLoadStatus.loaded) {
           final cartList = cartController.state.items;
-          return Scaffold(
-            appBar: appBar(context),
-            body: Column(
-              children: [
-                Expanded(
-                  child: RPadding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: cartList.isEmpty
-                        ? Center(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  "It's time for Shopping!",
-                                  style: Theme.of(context).textTheme.headline5,
-                                ),
-                                SizedBox(height: 10.w),
-                                AspectRatio(
-                                  aspectRatio: 1,
-                                  child: SvgPicture.asset(
-                                    'assets/images/shopping-sale.svg',
+          return SafeArea(
+            child: Scaffold(
+              appBar: appBar(context),
+              body: Column(
+                children: [
+                  Expanded(
+                    child: RPadding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: cartList.isEmpty
+                          ? Center(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    "It's time for Shopping!",
+                                    style:
+                                        Theme.of(context).textTheme.headline5,
                                   ),
-                                ),
-                              ],
-                            ),
-                          )
-                        : CustomRefreshIndicator(
-                            builder: MaterialIndicatorDelegate(
-                              backgroundColor:
-                                  Theme.of(context).colorScheme.surface,
-                              builder: (context, controller) {
-                                final indicator =
-                                    controller.value.clamp(0.0, 1.0);
-                                return Transform.rotate(
-                                  angle: 2 * pi * controller.value,
-                                  child: Icon(
-                                    Icons.refresh,
-                                    color: kPrimaryColor.withOpacity(indicator),
+                                  SizedBox(height: 10.w),
+                                  AspectRatio(
+                                    aspectRatio: 1,
+                                    child: SvgPicture.asset(
+                                      'assets/images/shopping-sale.svg',
+                                    ),
                                   ),
-                                );
-                              },
-                            ),
-                            onRefresh: () async {
-                              await Future.delayed(
-                                const Duration(milliseconds: 500),
-                                () async {
-                                  await _refresh(context);
+                                ],
+                              ),
+                            )
+                          : CustomRefreshIndicator(
+                              builder: MaterialIndicatorDelegate(
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.surface,
+                                builder: (context, controller) {
+                                  final indicator =
+                                      controller.value.clamp(0.0, 1.0);
+                                  return Transform.rotate(
+                                    angle: 2 * pi * controller.value,
+                                    child: Icon(
+                                      Icons.refresh,
+                                      color:
+                                          kPrimaryColor.withOpacity(indicator),
+                                    ),
+                                  );
                                 },
-                              );
-                            },
-                            child: ListView.builder(
-                              itemBuilder: (context, index) {
-                                final CartItem item =
-                                    cartList.values.elementAt(index);
-                                return Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 10),
-                                  child: Dismissible(
-                                    key: ValueKey(
-                                        cartList.keys.elementAt(index)),
-                                    // key: UniqueKey(),
-                                    direction: DismissDirection.endToStart,
-                                    background: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                              horizontal: 20)
-                                          .r,
-                                      decoration: BoxDecoration(
-                                        // color: const Color(0xffffe6e6),
-                                        color: Colors.red,
-                                        borderRadius:
-                                            BorderRadius.circular(15).r,
-                                      ),
-                                      child: const Row(children: [
-                                        Spacer(),
-                                        Icon(Icons.delete, color: Colors.white),
-                                      ]),
-                                    ),
-                                    child: CartItemCard(
-                                      product:
-                                          productsController.state.prodById(
-                                        item.productId,
-                                      ),
-                                      color: item.color,
-                                      numOfItem: item.numOfItem,
-                                    ),
-                                    onDismissed: (direction) async {
-                                      final userId = authController.state.id;
-                                      final authToken =
-                                          authController.state.token;
-                                      try {
-                                        cartController.removeFromCart(
-                                          cartId:
-                                              cartList.keys.elementAt(index),
-                                          userId: userId,
-                                          authToken: authToken,
-                                        );
-                                      } catch (err) {
-                                        await showErrorDialog(
-                                          context: context,
-                                          err: err.toString(),
-                                        );
-                                      }
-                                    },
-                                    confirmDismiss: (_) {
-                                      return showDialog(
-                                        context: context,
-                                        builder: (context) => AlertDialog(
-                                          title: const Text(
-                                              'Are you sure to remove product?'),
-                                          titlePadding: const EdgeInsets.only(
-                                            left: 24,
-                                            right: 24,
-                                            top: 24,
-                                            bottom: 0,
-                                          ).r,
-                                          actions: [
-                                            TextButton(
-                                                child: const Text('Remove',
-                                                    style: TextStyle(
-                                                        color: Colors.red)),
-                                                onPressed: () {
-                                                  Modular.to.pop(true);
-                                                }),
-                                            TextButton(
-                                                child: Text(
-                                                  'Cancel',
-                                                  style: TextStyle(
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .onSurface),
-                                                ),
-                                                onPressed: () {
-                                                  Modular.to.pop(false);
-                                                }),
-                                          ],
-                                        ),
-                                      );
-                                    },
-                                  ),
+                              ),
+                              onRefresh: () async {
+                                await Future.delayed(
+                                  const Duration(milliseconds: 500),
+                                  () async {
+                                    await _refresh(context);
+                                  },
                                 );
                               },
-                              itemCount: cartList.length,
+                              child: ListView.builder(
+                                itemBuilder: (context, index) {
+                                  final CartItem item =
+                                      cartList.values.elementAt(index);
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 10),
+                                    child: Dismissible(
+                                      key: ValueKey(
+                                          cartList.keys.elementAt(index)),
+                                      // key: UniqueKey(),
+                                      direction: DismissDirection.endToStart,
+                                      background: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                                horizontal: 20)
+                                            .r,
+                                        decoration: BoxDecoration(
+                                          // color: const Color(0xffffe6e6),
+                                          color: Colors.red,
+                                          borderRadius:
+                                              BorderRadius.circular(15).r,
+                                        ),
+                                        child: const Row(children: [
+                                          Spacer(),
+                                          Icon(Icons.delete,
+                                              color: Colors.white),
+                                        ]),
+                                      ),
+                                      child: CartItemCard(
+                                        product:
+                                            productsController.state.prodById(
+                                          item.productId,
+                                        ),
+                                        color: item.color,
+                                        numOfItem: item.numOfItem,
+                                      ),
+                                      onDismissed: (direction) async {
+                                        final userId = authController.state.id;
+                                        final authToken =
+                                            authController.state.token;
+                                        try {
+                                          cartController.removeFromCart(
+                                            cartId:
+                                                cartList.keys.elementAt(index),
+                                            userId: userId,
+                                            authToken: authToken,
+                                          );
+                                        } catch (err) {
+                                          await showErrorDialog(
+                                            context: context,
+                                            err: err.toString(),
+                                          );
+                                        }
+                                      },
+                                      confirmDismiss: (_) {
+                                        return showDialog(
+                                          context: context,
+                                          builder: (context) => AlertDialog(
+                                            title: const Text(
+                                                'Are you sure to remove product?'),
+                                            titlePadding: const EdgeInsets.only(
+                                              left: 24,
+                                              right: 24,
+                                              top: 24,
+                                              bottom: 0,
+                                            ).r,
+                                            actions: [
+                                              TextButton(
+                                                  child: const Text('Remove',
+                                                      style: TextStyle(
+                                                          color: Colors.red)),
+                                                  onPressed: () {
+                                                    Modular.to.pop(true);
+                                                  }),
+                                              TextButton(
+                                                  child: Text(
+                                                    'Cancel',
+                                                    style: TextStyle(
+                                                        color: Theme.of(context)
+                                                            .colorScheme
+                                                            .onSurface),
+                                                  ),
+                                                  onPressed: () {
+                                                    Modular.to.pop(false);
+                                                  }),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  );
+                                },
+                                itemCount: cartList.length,
+                              ),
                             ),
-                          ),
+                    ),
                   ),
-                ),
-                const Padding(
-                  padding: EdgeInsets.only(bottom: kBottomNavigationBarHeight),
-                  child: CheckOutCard(),
-                ),
-              ],
+                  const CheckOutCard()
+                ],
+              ),
             ),
           );
         } else {
