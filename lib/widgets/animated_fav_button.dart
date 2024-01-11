@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-
 class AnimatedFavRoundButton extends StatefulWidget {
   const AnimatedFavRoundButton({
     super.key,
@@ -49,8 +48,8 @@ class _AnimatedFavRoundButtonState extends State<AnimatedFavRoundButton>
       child: AnimatedBuilder(
         animation: _animation,
         builder: (context, child) => Container(
-          width: 26.w,
-          height: 26.w,
+          width: 32.w,
+          height: 32.w,
           decoration: BoxDecoration(
             color: widget.active
                 ? Theme.of(context).colorScheme.primary.withOpacity(.15)
