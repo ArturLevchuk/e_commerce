@@ -19,8 +19,8 @@ class ProductsGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     return GridView.builder(
       physics: const BouncingScrollPhysics(),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        childAspectRatio: 0.80.w,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        childAspectRatio: 0.85,
         crossAxisCount: 2,
       ),
       itemBuilder: (context, index) => Container(
@@ -35,7 +35,7 @@ class ProductsGrid extends StatelessWidget {
           borderRadius: BorderRadius.circular(5).r,
         ),
         child: ProductCard(
-          aspectRatio: 1.4.w,
+          aspectRatio: 1.45,
           leftPadding: false,
           productId: products[index].id,
           press: () {
